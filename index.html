@@ -45,7 +45,14 @@ input[type=range]{accent-color:var(--acc)}
 .strip{padding:7px 20px;font-size:12px;text-align:center;border-bottom:1px solid #4a2a2c;background:#241718;color:#f3b0b0}
 nav{max-width:1560px;margin:0 auto;padding:0 20px;display:grid;overflow:auto;gap:6px}
 nav button{border:1px solid transparent;border-radius:8px;background:none;padding:10px 12px;color:var(--mut);white-space:nowrap;font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.07em}
-nav.groups{padding-top:10px}nav.sub{padding-top:6px;padding-bottom:8px}
+nav.groups{padding-top:10px;padding-bottom:10px;overflow:visible}
+.ng{position:relative}.ng>button{width:100%;display:flex;align-items:center;justify-content:center;gap:4px}
+.ng .cur{text-transform:none;letter-spacing:0;font-weight:500;opacity:.85}
+.ng .caret{margin-left:6px;font-size:11px;opacity:.8;transition:transform .15s}.ng.open .caret{transform:rotate(180deg)}
+.ng .dd{display:none;position:absolute;top:calc(100% + 6px);left:0;right:0;z-index:30;background:var(--bg2);border:1px solid var(--line2);border-radius:10px;padding:6px;box-shadow:0 12px 30px #0009}
+.ng.open .dd{display:grid;gap:4px;animation:tipin .12s ease-out}
+.ng .dd button{text-transform:none;letter-spacing:0;font-weight:500;font-size:13px;text-align:left;padding:8px 12px;border-color:transparent;background:none}
+.ng .dd button:hover{background:var(--card2)}.ng .dd button.on{background:var(--tint);border-color:var(--acc);color:var(--txt)}
 nav button:hover{background:var(--card);color:var(--txt)}
 nav.groups button{background:var(--card);border-color:var(--line)}nav.groups button.on{background:linear-gradient(90deg,var(--acc),#2a8fbf);border-color:var(--acc);color:#fff}
 
@@ -151,6 +158,15 @@ label.f input,label.f select{color:var(--txt);text-transform:none;letter-spacing
 .sess b{font-size:13px}.sess small{display:block;color:var(--mut);font-size:11px}
 .rolelist .click{display:grid;grid-template-columns:1fr auto;gap:6px;padding:9px 10px;border:1px solid var(--line);border-radius:8px;margin-bottom:6px;background:var(--card2)}
 .rolelist .on{border-color:var(--acc);background:var(--tint)}
+@media (max-height:860px){
+ .sc{padding:6px 12px}.sc small{display:none}.sc b{font-size:14px}
+ nav.groups{padding-top:6px;padding-bottom:6px}nav button{padding:7px 10px}
+ .wrap{padding-top:8px!important}.card{padding:12px}h2{padding-bottom:7px;margin-bottom:9px}
+ .kpi{font-size:21px}.grid{gap:10px}.stabs{margin-bottom:8px}.stabs button{padding:6px 10px}
+ .tip,.alert{padding:7px 11px;margin-bottom:7px}th,td{padding:5px 7px}.stat{margin:3px 0}
+ .rolelist .click{padding:6px 9px;margin-bottom:4px}.log div{padding:5px 0}
+ .footer .in{padding:7px 20px}.sess{padding:6px 9px}
+}
 .risk{border-radius:6px;display:inline-block;min-width:54px;text-align:center;padding:2px 6px;font-weight:700;border:1px solid var(--line2);background:var(--card2)}
 </style>
 </head>
@@ -772,7 +788,7 @@ function vIndex(){
   </div>`;
  return ih+(it==='me'?A:B);
 }
-function rankRows(){const q=norm(RK.q||'');const L=RK.rows.filter(r=>!q||norm(r.n+' '+r.nat).includes(q));const pg=pager('rkp',L.length,9);RK.pg=pg.html.replace(/render\(\)/g,"document.getElementById('rkBody').innerHTML=rankRows();document.getElementById('rkPg').innerHTML=RK.pg");return L.slice(pg.s,pg.e).map(r=>`<tr class="click" onclick="${r.me?"TAB='prof';render()":"openPro('"+r.id+"')"}" ${r.me?'style="background:var(--tint)"':''}><td>${r.rk}</td><td style="white-space:nowrap">${r.me?'<b class="warn">'+esc(r.n)+'</b>':esc(r.n)}</td><td>${r.age}</td><td><b>${r.v}</b></td><td class="small">${r.spec}</td><td class="small">${esc(r.last)}</td><td class="small">${r.next?esc(EVMAP[r.next.e].name.replace(/ by UTMB|HOKA /g,''))+' · '+esc(getF(r.next.e,r.next.c).name)+' (S'+(r.next.w+1)+')':''}</td></tr>`).join('')||'<tr><td colspan="7" class="mut">Aucun coureur trouvé.</td></tr>';
+function rankRows(){const q=norm(RK.q||'');const L=RK.rows.filter(r=>!q||norm(r.n+' '+r.nat).includes(q));const pg=pager('rkp',L.length,innerHeight<860?6:9);RK.pg=pg.html.replace(/render\(\)/g,"document.getElementById('rkBody').innerHTML=rankRows();document.getElementById('rkPg').innerHTML=RK.pg");return L.slice(pg.s,pg.e).map(r=>`<tr class="click" onclick="${r.me?"TAB='prof';render()":"openPro('"+r.id+"')"}" ${r.me?'style="background:var(--tint)"':''}><td>${r.rk}</td><td style="white-space:nowrap">${r.me?'<b class="warn">'+esc(r.n)+'</b>':esc(r.n)}</td><td>${r.age}</td><td><b>${r.v}</b></td><td class="small">${r.spec}</td><td class="small">${esc(r.last)}</td><td class="small">${r.next?esc(EVMAP[r.next.e].name.replace(/ by UTMB|HOKA /g,''))+' · '+esc(getF(r.next.e,r.next.c).name)+' (S'+(r.next.w+1)+')':''}</td></tr>`).join('')||'<tr><td colspan="7" class="mut">Aucun coureur trouvé.</td></tr>';
 }
 
 const EVMAP=Object.fromEntries(EVENTS.map(e=>[e.id,e]));
@@ -789,13 +805,14 @@ const hOf=s=>{const[a,b]=s.split(':').map(Number);return a+b/60;};
 
 // ---------- dates ----------
 function firstMonday(y){const d=new Date(y,0,1);while(d.getDay()!==1)d.setDate(d.getDate()+1);return d;}
-function weekOfDate(y,m,d){return Math.max(0,Math.min(51,Math.floor((new Date(y,m-1,d)-firstMonday(y))/864e5/7)));}
+function weekOfDate(y,m,d){return Math.max(0,Math.min(51,Math.floor(Math.round((new Date(y,m-1,d)-firstMonday(y))/864e5)/7)));}
 function evWeek(e,season){return weekOfDate(season||S.season,e.m,e.d);}
 function weekLabel(w,season){const d=firstMonday(season||S.season);d.setDate(d.getDate()+w*7);return d.getDate()+' '+MONTHS[d.getMonth()].slice(0,4)+'.';}
 function evDateLabel(e){return (e.dEst?'≈ ':'')+(e.dLabel||(e.d+' '+MONTHS[e.m-1]));}
 
 // ---------- état ----------
 let S=null, TAB='home', CAL_FILTER={cat:'all',reg:'all'};
+const APP_VERSION='2026-11-18-c';
 const SAVE_KEY='ultraTrailManager_v1';
 // ---------- sauvegardes multiples (une par carrière) ----------
 const IDX_KEY='utm_careers_v1',SLOT=id=>'utm_career_'+id;
@@ -926,6 +943,9 @@ function newCareer(){CR=CR_DEFAULT();CR_STEP=0;if(false){NEW_CONFIRM=true;docume
 function titleImport(){document.getElementById('titleBox').innerHTML=`<textarea id="impT" style="width:100%;height:90px" placeholder="Colle ta sauvegarde ici"></textarea><button class="sm pri" style="margin-top:6px" onclick="doImport();SCREEN='game';render()">Charger</button>`;}
 // ---------- création de carrière : assistant pas à pas ----------
 let CR_STEP=0;
+document.addEventListener('keydown',e=>{if(SCREEN!=='create'||e.key!=='Enter'||e.target.tagName==='TEXTAREA')return;e.preventDefault();
+ if(e.target.tagName==='INPUT')e.target.dispatchEvent(new Event('input'));
+ if(CR_STEP===CR_STEPS.length-1)tryCreate();else crGo(CR_STEP+1);});
 const CR_STEPS=[['identite','Identité'],['langues','Langues'],['niveau','Niveau'],['potentiel','Potentiel'],['specs','Spécialités'],['atout','Atout'],['recap','Récapitulatif']];
 function crCheck(step){
  if(step===0&&(!String(CR.first).trim()||!String(CR.last).trim()))return'Indique au moins ton prénom et ton nom.';
@@ -1052,7 +1072,7 @@ function delMail(id){S.inbox=S.inbox.filter(m=>m.id!==id);if(MAIL_SEL===id)MAIL_
 function vMail(){
  const L=S.inbox||[];const sel=L.find(m=>m.id===MAIL_SEL)||null;
  return `<div class="grid g2"><div class="card"><div class="row sp"><h2>📬 Messagerie</h2><div class="row"><button class="sm" onclick="S.inbox.forEach(m=>m.read=true);save();render()">Tout marquer comme lu</button></div></div>
- ${(()=>{UI._mp=pager('mlp',L.length,6);return'';})()}${L.length?`<div class="log">${L.slice(UI._mp.s,UI._mp.e).map(m=>`<div class="click row sp" style="padding:8px;${m.id===MAIL_SEL?'background:var(--tint);':''}" onclick="openMail('${m.id}')"><div>${m.read?'':'<span style="color:var(--acc)">●</span> '}<span class="small mut">${esc(m.from)}</span><br>${m.read?esc(m.subj):'<b>'+esc(m.subj)+'</b>'}</div><span class="small mut">S${m.w+1}</span></div>`).join('')}</div>${UI._mp.html}`:'<p class="mut">Aucun message.</p>'}</div>
+ ${(()=>{UI._mp=pager('mlp',L.length,innerHeight<860?4:6);return'';})()}${L.length?`<div class="log">${L.slice(UI._mp.s,UI._mp.e).map(m=>`<div class="click row sp" style="padding:8px;${m.id===MAIL_SEL?'background:var(--tint);':''}" onclick="openMail('${m.id}')"><div>${m.read?'':'<span style="color:var(--acc)">●</span> '}<span class="small mut">${esc(m.from)}</span><br>${m.read?esc(m.subj):'<b>'+esc(m.subj)+'</b>'}</div><span class="small mut">S${m.w+1}</span></div>`).join('')}</div>${UI._mp.html}`:'<p class="mut">Aucun message.</p>'}</div>
  <div class="card">${sel?`<div class="row sp"><div><div class="small mut">De : ${esc(sel.from)} · ${sel.season}, semaine ${sel.w+1}</div><h3 style="margin-top:4px">${esc(sel.subj)}</h3></div><button class="sm" onclick="delMail('${sel.id}')">🗑</button></div>
   <div style="margin:10px 0;line-height:1.6">${sel.body}</div>${sel.link?`<button class="pri" onclick="goLink('${sel.link.tab}')">→ ${esc(sel.link.lbl)}</button>`:''}`:'<p class="mut">Sélectionne un message.</p>'}</div></div>`;
 }
@@ -1080,7 +1100,7 @@ function vAgenda(){
  const cells=[];for(let i=0;i<off;i++)cells.push(null);for(let i=1;i<=nd;i++)cells.push(new Date(AG.y,AG.m,i));
  const today=dayDate(S.season,S.week,0);
  const cell=dt=>{if(!dt)return'<div></div>';
-  const wAbs=Math.floor((dt-fm)/864e5/7),di=(dt.getDay()+6)%7;const season=AG.y;const items=[];
+  const wAbs=Math.floor(Math.round((dt-fm)/864e5)/7),di=(dt.getDay()+6)%7;const season=AG.y;const items=[];
   const evs=EVENTS.filter(e=>e.m-1===dt.getMonth()&&e.d===dt.getDate());const mine=new Set();const sn=e=>esc(e.name.replace(/ by UTMB|HOKA |®/g,'').replace(/ —.*$/,''));
   for(const r of S.results.filter(r=>r.season===season)){const e=EVMAP[r.e];if(!evs.includes(e))continue;mine.add(e.id);items.push(['',`<span class="click" onclick="openRace('${e.id}',${season})">${r.dns?'🚫':r.dnf?'❌':'✅'} <b>${sn(e)}</b> · ${esc(getF(r.e,r.c).name)}<br>${resTxt(r)}</span>`,r.dns||r.dnf?4:1]);}
   if(season===S.season)for(const r of S.regs.filter(r=>!r.done)){const e=EVMAP[r.e];if(!evs.includes(e))continue;mine.add(e.id);items.push(['',`<span class="click" onclick="openRace('${e.id}',${season})">🏁 <b>${sn(e)}</b> · ${esc(getF(r.e,r.c).name)}</span>`,1]);}
@@ -1091,13 +1111,13 @@ function vAgenda(){
   if(season===S.season&&wAbs===S.week)planDays(S.plan,S.injury,S.ill)[di].forEach(x=>items.push(x));
   else if(S.hist&&S.hist[season*52+wAbs]){const h=S.hist[season*52+wAbs];planDays(h.plan,h.inj,h.ill)[di].forEach(x=>items.push(x));}
   const isToday=season===S.season&&wAbs===S.week;const past=dt<today;
-  return `<div style="min-height:78px;border:1px solid ${isToday?'var(--acc)':'var(--line)'};border-radius:8px;padding:5px;background:${isToday?'var(--tint)':'var(--card2)'};${past?'opacity:.55':''}"><div class="small ${isToday?'warn':'mut'}"><b>${dt.getDate()}</b></div>
-   ${items.map(([i,t,k])=>`<div class="small" style="margin-top:3px;${k===1?'background:#123a3d;border-radius:5px;padding:2px 4px':k===4?'background:#3a1d1d;border-radius:5px;padding:2px 4px':k===2?'background:#13304a;border-radius:5px;padding:2px 4px':''}">${i?i+' ':''}${t}</div>`).join('')}</div>`;};
+  const MAXI=3,more=items.length-MAXI;const shown=more>0?items.slice(0,MAXI-1):items;
+  return `<div data-tip="${more>0?esc(items.map(x=>(x[0]?x[0]+' ':'')+x[1]).join('<br>')):''}" style="min-height:0;overflow:hidden;border:1px solid ${isToday?'var(--acc)':'var(--line)'};border-radius:8px;padding:5px;background:${isToday?'var(--tint)':'var(--card2)'};${past?'opacity:.55':''}"><div class="small ${isToday?'warn':'mut'}"><b>${dt.getDate()}</b></div>
+   ${shown.map(([i,t,k])=>`<div class="small" style="margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;${k===1?'background:#123a3d;border-radius:5px;padding:2px 4px':k===4?'background:#3a1d1d;border-radius:5px;padding:2px 4px':k===2?'background:#13304a;border-radius:5px;padding:2px 4px':''}">${i?i+' ':''}${t}</div>`).join('')}${more>0?`<div class="small mut" style="margin-top:3px">+${more+1} autre(s)…</div>`:''}</div>`;};
  const offers=S.mediaOffers||[];
  const [at,ah]=stabs('ag',[['cal','🗓 Calendrier du mois'],['media','🎬 Médias & fans'+(offers.length?' ('+offers.length+')':'')]]);
- const CALH=`<div class="card"><div class="row sp"><h2>🗓 Agenda — ${MONTHS[AG.m]} ${AG.y}</h2><div class="row"><button class="sm" onclick="AG.m--;if(AG.m<0){AG.m=11;AG.y--;}render()">◀</button><button class="sm" onclick="AG=null;render()">Aujourd'hui</button><button class="sm" onclick="AG.m++;if(AG.m>11){AG.m=0;AG.y++;}render()">▶</button></div></div>
- <p class="small mut">Séances de la semaine en cours (selon ton plan d'entraînement) et des semaines passées, courses 🏁 et rendez-vous médias. La case turquoise = cette semaine.</p>
- <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:5px">${DAYS.map(d=>`<div class="small mut" style="text-align:center">${d}</div>`).join('')}${cells.map(cell).join('')}</div></div>`;
+ const CALH=`<div class="card"><div class="row sp"><h2 data-tip="Séances de la semaine en cours et des semaines passées, courses 🏁 et rendez-vous médias. La case turquoise = cette semaine. Survole une case chargée pour tout voir.">🗓 Agenda — ${MONTHS[AG.m]} ${AG.y} ℹ️</h2><div class="row"><button class="sm" onclick="AG.m--;if(AG.m<0){AG.m=11;AG.y--;}render()">◀</button><button class="sm" onclick="AG=null;render()">Aujourd'hui</button><button class="sm" onclick="AG.m++;if(AG.m>11){AG.m=0;AG.y++;}render()">▶</button></div></div>
+ <div style="display:grid;grid-template-columns:repeat(7,1fr);grid-template-rows:auto repeat(${Math.ceil(cells.length/7)},minmax(0,1fr));gap:5px;height:calc(100vh - 385px);min-height:300px">${DAYS.map(d=>`<div class="small mut" style="text-align:center">${d}</div>`).join('')}${cells.map(cell).join('')}</div></div>`;
  const MED=`<div class="grid g2"><div class="card"><h2>🎬 Demandes médias</h2><p class="small mut">Plus ta réputation et tes fans grimpent, plus les grosses chaînes te sollicitent. Les petits youtubeurs rapportent moins de fans mais acceptent tout le monde. Chaque rendez-vous fatigue un peu.</p>
   ${offers.length?offers.slice(0,3).map(o=>`<div class="card" style="background:var(--card2);margin-bottom:8px"><div class="row sp"><b>${MEDIA_ICON[o.t]} ${esc(o.n)}</b><span class="small mut">${o.t}${o.small?' · petit créateur':''}</span></div><div>${esc(o.fmt)} — ${DAYS[o.d]} ${dayDate(o.season,o.w,o.d).toLocaleDateString('fr-FR',{day:'numeric',month:'short'})}</div><div class="small">+${fansTxt(o.fans)} fans estimés${o.pay?' · '+money(o.pay):''}</div><div class="row" style="margin-top:6px"><button class="pri sm" onclick="acceptMedia('${o.id}')">Accepter</button><button class="sm" onclick="declineMedia('${o.id}')">Refuser</button></div></div>`).join(''):'<p class="mut">Aucune demande pour le moment.</p>'}</div>
  <div class="card"><h2>❤️ Fans : ${fansTxt(S.fans||0)}</h2><p class="small">Tes fans augmentent avec tes résultats et tes passages médias. Ils comptent comme de la réputation en plus pour attirer sponsors et médias (bonus actuel : +${fansRep().toFixed(1)}).</p>
@@ -1113,9 +1133,19 @@ const NAV_GROUPS=[
 ];
 function navHTML(){
  const g=NAV_GROUPS.find(x=>x.tabs.includes(TAB))||NAV_GROUPS[0];const badge=n=>n?` <span class="badge" style="background:#fff;color:var(--acc);border-color:#fff;margin-left:6px">${n}</span>`:'';
- return `<nav class="groups" style="grid-template-columns:repeat(${NAV_GROUPS.length},1fr)">${NAV_GROUPS.map(x=>`<button class="${x===g?'on':''}" onclick="TAB='${x.tabs[0]}';render()">${x.i} ${x.n}${x.tabs.includes('mail')?badge(unread()):''}</button>`).join('')}</nav>
- <nav class="sub" style="grid-template-columns:repeat(${g.tabs.filter(k=>k!=='race'||TAB==='race').length},1fr)">${g.tabs.filter(k=>k!=='race'||TAB==='race').map(k=>`<button class="${TAB===k?'on':''}" onclick="TAB='${k}';render()">${TABS[k][0]} ${TABS[k][1]}${k==='mail'?badge(unread()):''}</button>`).join('')}</nav>`;
+ return `<nav class="groups" style="grid-template-columns:repeat(${NAV_GROUPS.length},1fr)">${NAV_GROUPS.map((x,gi)=>{const tabs=x.tabs.filter(k=>k!=='race'||TAB==='race');const cur=x.tabs.includes(TAB)?TABS[TAB][1]:'';
+  return `<div class="ng" data-g="${gi}"><button class="${x===g?'on':''}" onclick="navToggle(${gi},event)">${x.i} ${x.n}${cur?` <span class="cur">· ${cur}</span>`:''}${x.tabs.includes('mail')?badge(unread()):''}<span class="caret">▾</span></button>
+   <div class="dd">${tabs.map(k=>`<button class="${TAB===k?'on':''}" onclick="navGo('${k}')">${TABS[k][0]} ${TABS[k][1]}${k==='mail'?badge(unread()):''}</button>`).join('')}</div></div>`;}).join('')}</nav>`;
 }
+let NAV_T=null,NAV_L=null;
+function navOpen(gi){document.querySelectorAll('.ng').forEach(n=>n.classList.toggle('open',n.dataset.g==String(gi)));}
+function navClose(){document.querySelectorAll('.ng.open').forEach(n=>n.classList.remove('open'));}
+function navToggle(gi,ev){ev.stopPropagation();clearTimeout(NAV_T);const n=document.querySelector(`.ng[data-g="${gi}"]`);if(n&&n.classList.contains('open'))navClose();else navOpen(gi);}
+function navGo(k){navClose();TAB=k;render();}
+document.addEventListener('mouseover',e=>{const n=e.target.closest&&e.target.closest('.ng');clearTimeout(NAV_L);
+ if(n){if(!n.classList.contains('open')){clearTimeout(NAV_T);NAV_T=setTimeout(()=>navOpen(n.dataset.g),500);}}
+ else{clearTimeout(NAV_T);NAV_L=setTimeout(navClose,250);}});
+document.addEventListener('click',e=>{if(!(e.target.closest&&e.target.closest('.ng')))navClose();});
 // ---------- sous-onglets et pagination (pas de longues pages) ----------
 const UI={};
 function stabs(key,items){if(!UI[key]||!items.some(i=>i[0]===UI[key]))UI[key]=items[0][0];
@@ -1306,13 +1336,13 @@ function vPrep(){
    <h3>Ce que demande cette course</h3><ul class="small">${demands(g).map(x=>`<li>${x}</li>`).join('')}</ul>`;
  }
  html+=`</div>`;
- if(g){const sp=suggestPlan();html+=`<div class="card"><h3>Semaine suggérée : ${esc(sp.label)}</h3><p>${sp.hours} h · ${Object.entries(sp.s).map(([k,n])=>`${SESS[k].i} ${SESS[k].n} ×${n}`).join(' · ')}</p><button class="pri" onclick="applySuggested();TAB='train';render()">Appliquer à mon entraînement</button></div>`;}
- html+=`</div><div>${tipBox()}`;
+ html+=`</div><div>${tipBox(1)}`;
  if(g){
   const preps=prepRaces(g);
   html+=`<div class="card"><h3>Courses de préparation conseillées</h3><p class="small mut">Idéalement 4 à 10 semaines avant l'objectif, sur un format plus court : tester le matériel, la nutrition et l'allure sans trop se fatiguer.</p>
   ${preps.length?`<table>${preps.map(([e,f,w])=>`<tr><td>${weekLabel(w)}<br><span class="mut small">J-${g.week-w} sem.</span></td><td><b>${esc(e.name)}</b><br><span class="small mut">${esc(f.name)} · ${f.km} km · ${f.dp} D+</span></td><td>${regBtn(e,f)}</td></tr>`).join('')}</table>`:'<p class="mut">Aucune course adaptée dans la fenêtre.</p>'}</div>`;
  }
+ if(g){const sp=suggestPlan();html+=`<div class="card" style="margin-top:10px"><h3>Semaine suggérée : ${esc(sp.label)}</h3><p>${sp.hours} h · ${Object.entries(sp.s).map(([k,n])=>`${SESS[k].i} ${SESS[k].n} ×${n}`).join(' · ')}</p><button class="pri" onclick="applySuggested();TAB='train';render()">Appliquer à mon entraînement</button></div>`;}
  return html+`</div></div>`;
 }
 function demands(g){
@@ -1331,7 +1361,7 @@ function prepRaces(g){
  const out=[];const gc=CATS.indexOf(catOf(g.f));
  for(const e of EVENTS){const w=evWeek(e);if(w<g.week-10||w>g.week-3||w<=S.week)continue;
   for(const f of e.formats){const c=CATS.indexOf(catOf(f));if(c<gc||(gc===0&&c===0)){out.push([e,f,w,Math.abs(f.dp/f.km-g.f.dp/g.f.km)+(e.region==='world'?30:0)]);}}}
- return out.sort((a,b)=>a[3]-b[3]).slice(0,6);
+ return out.sort((a,b)=>a[3]-b[3]).slice(0,innerHeight<960?4:6);
 }
 
 // ---------- page d'une course (résultats) ----------
@@ -1487,7 +1517,7 @@ function vProf(){
  ${lvl().job||!r.job?`<button class="sm" style="margin-top:10px" onclick="S.runner.job=!S.runner.job;S.plan.hours=Math.min(S.plan.hours,maxHours());log(S.runner.job?'Retour au travail.':'Tu passes pro : plus de salaire, mais tout ton temps pour t\\'entraîner !','big');save();render()">${r.job?'Passer pro (quitter le travail)':'Reprendre un travail'}</button>`:''}</div>
  <div class="card"><h2>Langues</h2><p>${langChips(S.runner.langs)}</p><p class="small mut">Tes langues progressent au contact de ton staff étranger.</p></div></div>`;
 }
-function vLog(){const pg=pager('lgp',S.log.length,12);return `<div class="card"><h2>Journal</h2><div class="log">${S.log.slice(pg.s,pg.e).map(l=>`<div>${l.type==='big'?'⭐ ':''}<span class="mut small">${l.s} · S${l.w+1}</span> ${l.txt}</div>`).join('')}</div>${pg.html}</div>`;}
+function vLog(){const pg=pager('lgp',S.log.length,innerHeight<860?9:12);return `<div class="card"><h2>Journal</h2><div class="log">${S.log.slice(pg.s,pg.e).map(l=>`<div>${l.type==='big'?'⭐ ':''}<span class="mut small">${l.s} · S${l.w+1}</span> ${l.txt}</div>`).join('')}</div>${pg.html}</div>`;}
 
 
 // ---------- semaine suivante ----------
@@ -1944,10 +1974,15 @@ function openPro(id){
  window.hideTip=()=>{hide();cur=null;};
 })();
 
+// mises à jour (version installée depuis GitHub Pages)
+function checkUpdate(){fetch('version.json?t='+Date.now(),{cache:'no-store'}).then(r=>r.json()).then(j=>{if(j&&j.v&&j.v!==APP_VERSION)showUpdate(j);}).catch(()=>{});}
+function showUpdate(j){if(document.getElementById('updBar'))return;const d=document.createElement('div');d.id='updBar';
+ d.innerHTML=`<span>🎉 <b>Nouvelle version disponible</b>${j.note?' — '+esc(j.note):''}</span><button class="pri sm" onclick="try{save()}catch(e){};location.reload()">Mettre à jour</button><button class="sm" onclick="this.parentNode.remove()">Plus tard</button>`;
+ d.style.cssText='position:fixed;top:14px;left:50%;transform:translateX(-50%);z-index:60;background:var(--bg2);border:1px solid var(--acc);border-radius:10px;padding:10px 14px;display:flex;gap:12px;align-items:center;box-shadow:0 10px 30px #000a';document.body.appendChild(d);}
+if(location.hostname.endsWith('github.io')){setTimeout(checkUpdate,3000);setInterval(checkUpdate,5*60*1000);}
 // fermer une fenêtre en cliquant à l'extérieur (sauf pendant une course)
 document.getElementById('modal').addEventListener('mousedown',e=>{const m=e.currentTarget;if(e.target!==m)return;if(RACE||document.getElementById('raceEnd'))return;closeModal();});
-// application installable (GitHub Pages) : mise en cache hors-ligne
-if('serviceWorker' in navigator&&location.protocol==='https:'&&!location.hostname.endsWith('claude.ai')){try{navigator.serviceWorker.register('sw.js').catch(()=>{});}catch(e){}}
+if('serviceWorker' in navigator&&location.hostname.endsWith('github.io')){try{navigator.serviceWorker.register('sw.js').catch(()=>{});}catch(e){}}
 load();render();
 </script>
 </body>
