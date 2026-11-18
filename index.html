@@ -722,8 +722,8 @@ function vBrandRank(){
  return `<div class="card"><h2>Classement des sponsors ${S.season}</h2>
  <p class="small mut">Points gagnés par les athlètes de chaque marque (toi compris) : victoire 10, 2e 7, 3e 5, top 10 2 — ×2 sur la Finale, ×1,5 sur un Major ou une grande classique. Les marques du podium paient 15 % de plus leurs nouveaux contrats.</p>
  <div class="chips" style="margin-bottom:8px">${Object.entries(SPONSOR_CATS).map(([k,c])=>`<button class="sm ${SP_CAT===k?'pri':''}" onclick="SP_CAT='${k}';UI.bpp=0;render()">${c.i} ${c.n}</button>`).join('')}</div>
- ${(()=>{UI._bp=pager('bpp',rows.length,innerHeight<860?5:7);return'';})()}<table><tr><th>#</th><th>Marque</th><th>Athlètes</th><th>Victoires</th><th>Podiums</th><th>Points</th></tr>
- ${rows.slice(UI._bp.s,UI._bp.e).map((r,k)=>{const i=UI._bp.s+k;return `<tr ${r.me?'style="background:var(--tint)"':''}><td>${i+1}</td><td style="white-space:nowrap">${logo('brand',r.b,r.b,38)}<b class="click" onclick="openBrand('${r.b.replace(/'/g,"\\'")}')">${esc(r.b)}</b> <span class="small mut">${'★'.repeat(r.t)}</span>${r.me?' <span class="badge">ton sponsor</span>':''}</td><td class="small">${r.ath.length?r.ath.slice(0,4).map(p=>`<span class="click" onclick="openPro('${p.id}')">${p.flag} ${esc(p.last)}</span>`).join(', ')+(r.ath.length>4?' +'+(r.ath.length-4):''):'—'}${r.me?' + toi':''}</td><td>${r.w}</td><td>${r.p}</td><td><b>${Math.round(r.pts)}</b></td></tr>`;}).join('')}</table>${UI._bp.html}</div>`;
+ ${(()=>{UI._bp=pager('bpp',rows.length,4);return'';})()}<table><tr><th>#</th><th>Marque</th><th>Athlètes</th><th>Victoires</th><th>Podiums</th><th>Points</th></tr>
+ ${rows.slice(UI._bp.s,UI._bp.e).map((r,k)=>{const i=UI._bp.s+k;return `<tr ${r.me?'style="background:var(--tint)"':''}><td>${i+1}</td><td style="white-space:nowrap">${logo('brand',r.b,r.b,58)}<b class="click" onclick="openBrand('${r.b.replace(/'/g,"\\'")}')">${esc(r.b)}</b> <span class="small mut">${'★'.repeat(r.t)}</span>${r.me?' <span class="badge">ton sponsor</span>':''}</td><td class="small">${r.ath.length?r.ath.slice(0,4).map(p=>`<span class="click" onclick="openPro('${p.id}')">${p.flag} ${esc(p.last)}</span>`).join(', ')+(r.ath.length>4?' +'+(r.ath.length-4):''):'—'}${r.me?' + toi':''}</td><td>${r.w}</td><td>${r.p}</td><td><b>${Math.round(r.pts)}</b></td></tr>`;}).join('')}</table>${UI._bp.html}</div>`;
 }
 function brandBonus(cat,brand){const r=brandTable(cat).findIndex(x=>x.b===brand);return r>=0&&r<3&&(((S.brandPts||{})[S.season]||{})[brand]||{}).pts?1.15:1;}
 // ---------- inscriptions / forfaits de dernière minute ----------
@@ -815,7 +815,7 @@ function evDateLabel(e){return (e.dEst?'≈ ':'')+(e.dLabel||(e.d+' '+MONTHS[e.m
 
 // ---------- état ----------
 let S=null, TAB='home', CAL_FILTER={cat:'all',reg:'all'};
-const APP_VERSION='2026-11-18-e';
+const APP_VERSION='2026-11-18-g';
 const SAVE_KEY='ultraTrailManager_v1';
 // ---------- sauvegardes multiples (une par carrière) ----------
 const IDX_KEY='utm_careers_v1',SLOT=id=>'utm_career_'+id;
@@ -1219,7 +1219,7 @@ function openBrand(b){
  const ath=PROS.filter(p=>Object.values(proSpons(p)).includes(b));
  const mine=S.sponsors.filter(s=>s.brand===b),offs=S.offers.filter(o=>o.brand===b);
  const m=document.getElementById('modal');m.className='modal';
- m.innerHTML=`<div class="mbox" style="max-width:900px"><div class="row sp"><div style="display:flex;align-items:center">${logo('brand',b,b,96)}<div><h2 style="border:none;padding:0;margin:0;font-size:22px;text-transform:none;letter-spacing:0">${esc(b)} <span class="mut small">${'★'.repeat(tier)}</span></h2>
+ m.innerHTML=`<div class="mbox" style="max-width:900px"><div class="row sp"><div style="display:flex;align-items:center">${logo('brand',b,b,150)}<div><h2 style="border:none;padding:0;margin:0;font-size:22px;text-transform:none;letter-spacing:0">${esc(b)} <span class="mut small">${'★'.repeat(tier)}</span></h2>
   <div class="mut">${inf?esc(inf.o)+' · ':''}${cats.map(c=>SPONSOR_CATS[c].i+' '+SPONSOR_CATS[c].n).join(' · ')}</div></div></div><button onclick="closeModal()">✕</button></div>
   <div class="grid g2" style="margin-top:14px"><div class="card"><h2>Dans le trail</h2><p>${inf?esc(inf.h):'Marque présente sur le circuit trail. Pas encore de fiche détaillée.'}</p>
    ${inf&&inf.m.length?`<h3 style="margin-top:12px">Modèles phares</h3><div class="row">${inf.m.map(x=>`<span class="pill">${esc(x)}</span>`).join('')}</div>`:''}
@@ -1310,7 +1310,7 @@ function vHome(){
     <div><div class="mut small">Risques cette semaine</div><div class="row" style="margin-top:6px"><span class="risk ${riskClass(ir)}" style="background:#0002">🩹 ${pct(ir)}</span><span class="risk ${riskClass(il)}" style="background:#0002">🤒 ${pct(il)}</span></div><div class="small mut">blessure · maladie</div></div>
    </div>
   </div>
-  <div class="card"><h3>Mes prochaines courses</h3>${up.length?`<table>${up.map(r=>{const f=getF(r.e,r.c);return`<tr><td>${weekLabel(r.week)}</td><td style="display:flex;align-items:center">${logo('race',r.e,EVMAP[r.e].name,42,EVMAP[r.e].tier)}<div><b>${esc(EVMAP[r.e].name)}</b><br><span class="mut small">${esc(f.name)} · ${f.km} km · ${f.dp} D+</span></div></td><td>${S.goal===r.e+'|'+r.c?'🎯 Objectif':''}</td></tr>`;}).join('')}</table>`:'<p class="mut">Aucune inscription.</p>'}</div>
+  <div class="card"><h3>Mes prochaines courses</h3>${up.length?`<table>${up.map(r=>{const f=getF(r.e,r.c);return`<tr><td>${weekLabel(r.week)}</td><td style="display:flex;align-items:center">${logo('race',r.e,EVMAP[r.e].name,62,EVMAP[r.e].tier)}<div><b>${esc(EVMAP[r.e].name)}</b><br><span class="mut small">${esc(f.name)} · ${f.km} km · ${f.dp} D+</span></div></td><td>${S.goal===r.e+'|'+r.c?'🎯 Objectif':''}</td></tr>`;}).join('')}</table>`:'<p class="mut">Aucune inscription.</p>'}</div>
  </div>
  <div>
   ${tipBox()}
@@ -1482,7 +1482,7 @@ function vRace(){
    ${ent.length?`<p class="small">⭐ Pros inscrits : ${ent.map(p=>`<span class="click" onclick="openPro('${p.id}')">${p.flag} ${esc(p.first)} ${esc(p.last)}</span>`).join(', ')}</p>`:''}
    ${past&&!rows.length&&!dnf.length&&!me?'<p class="small mut">Aucun pro au départ de ce format.</p>':''}</div>`;}).join('');
  return `<div class="row" style="margin-bottom:10px"><button class="sm" onclick="TAB=RV.back||'agenda';render()">← Retour</button></div>
- <div class="card" style="margin-bottom:12px;display:flex;align-items:center">${logo('race',e.id,e.name,80,e.tier)}<div style="flex:1"><h2 style="border:none;padding:0;margin:0 0 4px">${esc(e.name)} ${badge}</h2><div class="mut">${esc(e.place)}, ${esc(e.country)} · ${evDateLabel(e)} ${season} · technicité ${'●'.repeat(e.tech)}${'○'.repeat(5-e.tech)} · ${past?'<b>Terminée</b>':'À venir'}</div></div></div>${rfh}${fmts}`;
+ <div class="card" style="margin-bottom:12px;display:flex;align-items:center">${logo('race',e.id,e.name,120,e.tier)}<div style="flex:1"><h2 style="border:none;padding:0;margin:0 0 4px">${esc(e.name)} ${badge}</h2><div class="mut">${esc(e.place)}, ${esc(e.country)} · ${evDateLabel(e)} ${season} · technicité ${'●'.repeat(e.tech)}${'○'.repeat(5-e.tech)} · ${past?'<b>Terminée</b>':'À venir'}</div></div></div>${rfh}${fmts}`;
 }
 
 // ---------- calendrier ----------
@@ -1493,7 +1493,7 @@ function regBtn(e,f){
  if(r)return r.done?'<span class="mut small">couru</span>':`<button class="sm" onclick="unreg('${e.id}','${f.code}')">Inscrit ✓ (annuler)</button>`;
  if(w===S.week&&!PROS.some(p=>(S.pros.res[p.id]||[]).some(y=>y.season===S.season&&y.e===e.id)))return '<span class="mut small">inscriptions closes</span>';
  if(w<=S.week){const win=PROS.map(p=>({p,r:(S.pros.res[p.id]||[]).find(y=>y.season===S.season&&y.e===e.id&&y.c===f.code&&!y.dnf)})).filter(x=>x.r).sort((a,b)=>a.r.time-b.r.time)[0];return `<span class="mut small click" onclick="openRace('${e.id}',S.season)">terminée${win?' · 1er pro : '+esc(win.p.last)+' '+fmtT(win.r.time):''} ›</span>`;}
- return `<button class="sm" onclick="register('${e.id}','${f.code}')">S'inscrire · ${money(regFee(e,f))}</button>`;
+ return `<button class="sm" style="white-space:nowrap" onclick="register('${e.id}','${f.code}')">S'inscrire · ${money(regFee(e,f))}</button>`;
 }
 function register(eid,code){
  const e=EVMAP[eid],f=getF(eid,code),w=evWeek(e),fee=regFee(e,f);
@@ -1515,25 +1515,25 @@ function register(eid,code){
 function unreg(eid,code){const i=S.regs.findIndex(r=>r.e===eid&&r.c===code&&!r.done);if(i<0)return;S.money+=S.regs[i].fee*.5;S.regs.splice(i,1);if(S.goal===eid+'|'+code)S.goal=null;log('Désinscription (50 % remboursés).');save();render();}
 function vCal(){
  const ft=CAL_FILTER;if(ft.month==null)ft.month=new Date(firstMonday(S.season).getTime()+S.week*7*864e5).getMonth();
- let html=`<div class="card" style="margin-bottom:14px"><div class="row sp"><h2>Calendrier ${S.season} — ${MONTHS[ft.month]}</h2>
+ let html=`<div class="card" style="margin-bottom:14px"><div class="row sp"><h2 data-tip="Running Stones : 20K = 1 · 50K = 2 · 100K = 3 · 100M = 4, doublées sur les Majors.<br>Badge ≈ = formats/chiffres approximatifs à vérifier sur le site de la course.">Calendrier ${S.season} — ${MONTHS[ft.month]} ℹ️</h2>
   <div class="row"><select onchange="CAL_FILTER.circ=this.value;render()">${[['all','Toutes les courses'],['utmb','Circuit UTMB'],['classic','Grandes classiques'],['local','Courses locales']].map(([v,n])=>`<option ${ft.circ===v?'selected':''} value="${v}">${n}</option>`).join('')}</select><select onchange="CAL_FILTER.cat=this.value;render()">${['all',...CATS].map(c=>`<option ${ft.cat===c?'selected':''} value="${c}">${c==='all'?'Tous formats':c}</option>`).join('')}</select>
   <select onchange="CAL_FILTER.reg=this.value;render()">${[['all','Partout'],['fr','France'],['eu','Europe'],['world','Monde']].map(([v,n])=>`<option ${ft.reg===v?'selected':''} value="${v}">${n}</option>`).join('')}</select></div></div>
-  <div class="row" style="margin:10px 0"><button class="sm" onclick="CAL_FILTER.month=(CAL_FILTER.month+11)%12;render()">◀</button>${MONTHS.map((m,i)=>`<button class="sm ${i===ft.month?'pri':''}" onclick="CAL_FILTER.month=${i};render()">${['janv.','févr.','mars','avr.','mai','juin','juil.','août','sept.','oct.','nov.','déc.'][i]}${EVENTS.some(e=>e.m-1===i&&S.regs.some(r=>r.e===e.id&&!r.done))?' ●':''}</button>`).join('')}<button class="sm" onclick="CAL_FILTER.month=(CAL_FILTER.month+1)%12;render()">▶</button></div>
-  <p class="small mut">Running Stones : 20K = 1 · 50K = 2 · 100K = 3 · 100M = 4, doublées sur les Majors. Badge <span class="badge b-est">≈</span> = formats/chiffres approximatifs à vérifier sur le site de la course.</p></div>`;
+  <div class="row" style="margin:10px 0 0"><button class="sm" onclick="CAL_FILTER.month=(CAL_FILTER.month+11)%12;render()">◀</button>${MONTHS.map((m,i)=>`<button class="sm ${i===ft.month?'pri':''}" onclick="CAL_FILTER.month=${i};render()">${['janv.','févr.','mars','avr.','mai','juin','juil.','août','sept.','oct.','nov.','déc.'][i]}${EVENTS.some(e=>e.m-1===i&&S.regs.some(r=>r.e===e.id&&!r.done))?' ●':''}</button>`).join('')}<button class="sm" onclick="CAL_FILTER.month=(CAL_FILTER.month+1)%12;render()">▶</button></div>
+</div>`;
  const evs=EVENTS.filter(e=>e.m-1===ft.month&&!(ft.circ&&ft.circ!=='all'&&(ft.circ==='utmb'?!isUTMB(e):e.tier!==ft.circ))&&!(ft.reg!=='all'&&!(ft.reg==='eu'?['eu','fr'].includes(e.region):e.region===ft.reg))).map(e=>({e,fs:e.formats.filter(f=>ft.cat==='all'||catOf(f)===ft.cat)})).filter(x=>x.fs.length);
  const weeks=[...new Set(evs.map(x=>evWeek(x.e)))].sort((x,y)=>x-y);
  if(!weeks.length)return html+'<div class="card mut">Aucune course ce mois-ci avec ces filtres.</div>';
  const wk='calw'+ft.month;if(!UI[wk]&&weeks.includes(S.week))UI[wk]='w'+S.week;
  const [cw,ch]=stabs(wk,weeks.map(w=>['w'+w,'Sem. du '+weekLabel(w)+' · '+evs.filter(x=>evWeek(x.e)===w).length+' course(s)']));
- const list=evs.filter(x=>'w'+evWeek(x.e)===cw);const pg=pager(wk+'p',list.length,3);html+=ch;
+ const list=evs.filter(x=>'w'+evWeek(x.e)===cw);const pg=pager(wk+'p',list.length,2);html+=ch+'<div class="grid g2">';
  for(const {e,fs} of list.slice(pg.s,pg.e)){
   const w=evWeek(e);
-  html+=`<div class="card ev ${w<S.week?'past':''}"><div class="row sp"><div style="display:flex;align-items:center">${logo('race',e.id,e.name,54,e.tier)}<div><b class="big click" onclick="RV={e:'${e.id}',season:S.season,back:'cal'};TAB='race';render()">${esc(e.name)} ›</b>${e.tier==='major'?'<span class="badge b-major">MAJOR</span>':''}${e.tier==='final'?'<span class="badge b-final">FINALES</span>':''}${e.isNew?'<span class="badge b-new">Nouveau</span>':''}${e.tier==='local'?'<span class="badge">Course locale · hors index</span>':''}${e.tier==='classic'?'<span class="badge b-major">Grande classique · hors index</span>':''}${e.est?'<span class="badge b-est">≈</span>':''}
-   <div class="mut small">${esc(e.place)}, ${esc(e.country)} · ${evDateLabel(e)} · technicité ${'●'.repeat(e.tech)}${'○'.repeat(5-e.tech)}</div></div></div><span class="mut small">sem. ${w+1}</span></div>
-   <table style="margin-top:6px"><tr><th>Format</th><th>Distance</th><th>D+</th><th>D−</th><th>Cat.</th><th>Stones</th><th>Départ</th><th></th></tr>
-   ${fs.map(f=>`<tr><td><b>${esc(f.name)}</b>${f.lottery?' <span class="badge">tirage</span>':''}${(()=>{const en=entrants(e,f);return en.length?`<br><span class="small" style="color:var(--acc2)">⭐ ${en.slice(0,6).map(p=>`<span class="click" onclick="openPro('${p.id}')">${p.flag} ${esc(p.last)}</span>`).join(', ')}${en.length>6?' +'+(en.length-6):''}</span>`:''})()}</td><td>${f.km} km</td><td>${f.dp} m</td><td>${f.dm} m</td><td>${catOf(f)}</td><td>${isUTMB(e)?STONES[catOf(f)]*(e.tier==='major'?2:1):'—'}</td><td class="small">${f.day?f.day+' ':''}${defStart(f)}</td><td>${regBtn(e,f)}</td></tr>`).join('')}</table></div>`;
+  html+=`<div class="card ev ${w<S.week?'past':''}"><div class="row sp"><div style="display:flex;align-items:center">${logo('race',e.id,e.name,innerHeight<860?58:80,e.tier)}<div><b class="big click" onclick="RV={e:'${e.id}',season:S.season,back:'cal'};TAB='race';render()">${esc(e.name)} ›</b>${e.tier==='major'?'<span class="badge b-major">MAJOR</span>':''}${e.tier==='final'?'<span class="badge b-final">FINALES</span>':''}${e.isNew?'<span class="badge b-new">Nouveau</span>':''}${e.tier==='local'?'<span class="badge">Course locale · hors index</span>':''}${e.tier==='classic'?'<span class="badge b-major">Grande classique · hors index</span>':''}${e.est?'<span class="badge b-est">≈</span>':''}
+   <div class="mut small">${esc(e.place)}, ${esc(e.country)} · ${evDateLabel(e)} · technicité ${'●'.repeat(e.tech)}${'○'.repeat(5-e.tech)}</div></div></div></div>
+   <table style="margin-top:8px"><tr><th>Format</th><th>Parcours</th><th>Cat.</th><th>Départ</th><th></th></tr>
+   ${fs.map(f=>`<tr><td><b>${esc(f.name)}</b>${f.lottery?' <span class="badge">tirage</span>':''}${(()=>{const en=entrants(e,f);return en.length?` <span class="badge" style="color:var(--acc2);border-color:#1f5a55" data-tip="${esc('<b>Pros inscrits</b><br>'+en.map(p=>p.flag+' '+p.first+' '+p.last).join('<br>'))}">⭐ ${en.length} pro${en.length>1?'s':''}</span>`:''})()}</td><td class="small" style="white-space:nowrap" data-tip="${esc(f.km+' km · D+ '+f.dp+' m · D− '+f.dm+' m')}">${f.km} km · +${f.dp} m</td><td class="small" style="white-space:nowrap">${catOf(f)}${isUTMB(e)?' · 🪨'+STONES[catOf(f)]*(e.tier==='major'?2:1):''}</td><td class="small">${f.day?f.day+' ':''}${defStart(f)}</td><td style="text-align:right">${regBtn(e,f)}</td></tr>`).join('')}</table></div>`;
  }
- return html+pg.html;
+ return html+'</div>'+pg.html;
 }
 
 // ---------- sponsors ----------
@@ -1562,14 +1562,14 @@ function vSpons(){
  const [t,h]=stabs('sp',[['mine','🤝 Mes contrats ('+S.sponsors.length+')'],['offers','📨 Offres reçues ('+S.offers.length+')'],['rank','🏆 Classement des marques']]);
  if(t==='rank')return h+vBrandRank();
  if(t==='offers'){const pg=pager('spo',S.offers.length,4);
-  return h+`<div class="card"><h2>Offres reçues</h2>${S.offers.length?`<div class="grid g2">${S.offers.slice(pg.s,pg.e).map((o,k)=>{const i=pg.s+k;return`<div class="card"><div class="row sp"><b style="display:flex;align-items:center">${logo('brand',o.brand,o.brand,48)}<span class="click" onclick="openBrand('${o.brand.replace(/'/g,"\\'")}')">${esc(o.brand)}</span>&nbsp;${'★'.repeat(o.tier)}</b><span class="mut small">expire dans ${o.exp} sem.</span></div>
+  return h+`<div class="card"><h2>Offres reçues</h2>${S.offers.length?`<div class="grid g2">${S.offers.slice(pg.s,pg.e).map((o,k)=>{const i=pg.s+k;return`<div class="card"><div class="row sp"><b style="display:flex;align-items:center">${logo('brand',o.brand,o.brand,72)}<span class="click" onclick="openBrand('${o.brand.replace(/'/g,"\\'")}')">${esc(o.brand)}</span>&nbsp;${'★'.repeat(o.tier)}</b><span class="mut small">expire dans ${o.exp} sem.</span></div>
   <div class="small" style="margin-top:6px">${SPONSOR_CATS[o.cat].n} · <b>${money(o.weekly)}/sem.</b> · prime podium ${money(o.bPod)} · prime victoire ${money(o.bWin)}</div>
   <div class="small">Objectif sur 1 an : <b>${OBJECTIVES.find(x=>x.id===o.obj).n}</b></div>
   <div class="small mut">Bonus matériel : ${SPONSOR_CATS[o.cat].perk}</div>
   <div class="row" style="margin-top:8px"><button class="pri sm" onclick="acceptOffer(${i})">Signer</button><button class="sm" onclick="declineOffer(${i})">Refuser</button></div></div>`;}).join('')}</div>${pg.html}`:'<p class="mut">Aucune offre pour l\'instant. Fais des résultats pour attirer les marques !</p>'}</div>`;}
  return h+`<div class="grid g2"><div class="card"><h2>Mes contrats</h2>
  <table><tr><th>Catégorie</th><th>Marque</th><th>€/sem</th><th>Objectif</th><th></th></tr>
- ${Object.entries(SPONSOR_CATS).map(([c,x])=>{const i=S.sponsors.findIndex(s=>s.cat===c);const s=S.sponsors[i];return`<tr><td data-tip="${esc('<b>'+x.n+'</b> — '+x.perk)}">${x.i} ${x.n}</td>${s?`<td style="white-space:nowrap">${logo('brand',s.brand,s.brand,36)}<b class="click" onclick="openBrand('${s.brand.replace(/'/g,"\\'")}')">${esc(s.brand)}</b> ${'★'.repeat(s.tier)}<br><span class="small mut">${s.left} sem. restantes</span></td><td>${money(s.weekly)}</td><td class="small">${OBJECTIVES.find(o=>o.id===s.obj).n}</td><td><button class="sm" onclick="breakContract(${i})">Rompre</button></td>`:'<td class="mut" colspan="4">—</td>'}</tr>`;}).join('')}
+ ${Object.entries(SPONSOR_CATS).map(([c,x])=>{const i=S.sponsors.findIndex(s=>s.cat===c);const s=S.sponsors[i];return`<tr><td data-tip="${esc('<b>'+x.n+'</b> — '+x.perk)}">${x.i} ${x.n}</td>${s?`<td style="white-space:nowrap">${logo('brand',s.brand,s.brand,54)}<b class="click" onclick="openBrand('${s.brand.replace(/'/g,"\\'")}')">${esc(s.brand)}</b> ${'★'.repeat(s.tier)}<br><span class="small mut">${s.left} sem. restantes</span></td><td>${money(s.weekly)}</td><td class="small">${OBJECTIVES.find(o=>o.id===s.obj).n}</td><td><button class="sm" onclick="breakContract(${i})">Rompre</button></td>`:'<td class="mut" colspan="4">—</td>'}</tr>`;}).join('')}
  </table></div><div>${tipBox(2)}<div class="card"><h2>Comment ça marche</h2><p class="small">Les marques te contactent selon ta réputation et tes fans (≥3 : petites marques ★, ≥25 : marques moyennes ★★, ≥60 : grandes marques ★★★). Chaque équipement apporte un bonus en course (survole une catégorie). Les marques du top 3 du classement paient 15 % de plus.</p></div></div></div>`;
 }
 function vStaff(){
@@ -2047,7 +2047,7 @@ function openPro(id){
   <div class="grid g2" style="margin-top:12px"><div><div class="card"><h3>Caractéristiques</h3>${bars}<p class="small mut">Estimées à partir de son niveau et de son profil.</p></div>
   <div class="card" style="margin-top:14px"><h3>🏆 Palmarès</h3>${(PALMARES[id]||[]).length?`<div class="small mut">Carrière réelle (principaux titres)</div><ul class="small">${PALMARES[id].map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`:'<p class="small mut">Palmarès réel non renseigné.</p>'}
    ${(()=>{const g=(S.pros.res[id]||[]).filter(r=>r.place&&r.place<=3&&EVMAP[r.e].tier!=='local').slice().reverse();return g.length?`<div class="small mut" style="margin-top:6px">Dans ta partie</div><ul class="small">${g.map(r=>`<li>${r.place===1?'🥇':r.place===2?'🥈':'🥉'} ${r.season} — ${esc(EVMAP[r.e].name.replace(/ by UTMB|HOKA /g,''))} (${esc(getF(r.e,r.c).name)})</li>`).join('')}</ul>`:'';})()}</div>
-  <div class="card" style="margin-top:14px"><h3>🤝 Sponsors</h3><table>${Object.entries(proSpons(p)).map(([c,b])=>`<tr><td>${SPONSOR_CATS[c].i} ${SPONSOR_CATS[c].n}</td><td style="display:flex;align-items:center">${logo('brand',b,b,30)}<b class="click" onclick="openBrand('${b.replace(/'/g,"\\'")}')">${esc(b)}</b>${PRO_SPONS_REAL[id]&&PRO_SPONS_REAL[id][c]?'':' <span class="small mut">*</span>'}</td></tr>`).join('')}</table><p class="small mut">* attribué par le jeu</p></div></div>
+  <div class="card" style="margin-top:14px"><h3>🤝 Sponsors</h3><table>${Object.entries(proSpons(p)).map(([c,b])=>`<tr><td>${SPONSOR_CATS[c].i} ${SPONSOR_CATS[c].n}</td><td style="display:flex;align-items:center">${logo('brand',b,b,46)}<b class="click" onclick="openBrand('${b.replace(/'/g,"\\'")}')">${esc(b)}</b>${PRO_SPONS_REAL[id]&&PRO_SPONS_REAL[id][c]?'':' <span class="small mut">*</span>'}</td></tr>`).join('')}</table><p class="small mut">* attribué par le jeu</p></div></div>
   <div class="card"><h3>UTMB Index</h3><div class="grid" style="grid-template-columns:repeat(5,1fr);gap:8px">${['gen',...CATS].map(c=>`<div data-tip="${esc(c==='gen'?'<b>Index général</b> — Son meilleur index de catégorie.':'<b>Index '+c+'</b> — Moyenne de ses 3 meilleures perfs '+c+' sur le circuit UTMB (2 dernières saisons). Sans résultat récent, on part de son niveau de référence.')}"><div class="mut small">${c==='gen'?'Général':c}</div><div class="kpi">${c==='gen'?proGen(p):proIdx(p,c)}</div></div>`).join('')}</div>
    <h3 style="margin-top:10px">Programme ${S.season}</h3><table>${sch.map(x=>{const e=EVMAP[x.e],f=getF(x.e,x.c);const r=(S.pros.res[id]||[]).find(y=>y.season===S.season&&y.e===x.e&&y.c===x.c);return`<tr><td class="small">${weekLabel(x.w)}</td><td>${esc(e.name.replace(/ by UTMB|HOKA /g,''))}<br><span class="small mut">${esc(f.name)} · ${f.km} km${isUTMB(e)?'':' · locale'}</span></td><td class="small">${r?(r.dnf?'<span class="bad">DNF</span>':fmtT(r.time)+(r.index?' · <b>'+r.index+'</b>':'')):(x.w<S.week?'—':'<span class="mut">à venir</span>')}</td></tr>`;}).join('')}</table>
    ${res.filter(r=>r.season<S.season).length?`<h3 style="margin-top:10px">Saisons passées</h3><table>${res.filter(r=>r.season<S.season).slice(0,8).map(r=>`<tr><td>${r.season}</td><td class="small">${esc(EVMAP[r.e].name)} — ${esc(getF(r.e,r.c).name)}</td><td class="small">${r.dnf?'DNF':fmtT(r.time)}${r.index?' · '+r.index:''}</td></tr>`).join('')}</table>`:''}
