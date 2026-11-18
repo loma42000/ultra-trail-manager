@@ -167,6 +167,9 @@ label.f input,label.f select{color:var(--txt);text-transform:none;letter-spacing
  .rolelist .click{padding:6px 9px;margin-bottom:4px}.log div{padding:5px 0}
  .footer .in{padding:7px 20px}.sess{padding:6px 9px}
 }
+.logo{display:inline-flex;vertical-align:middle;margin-right:8px;cursor:pointer;flex-shrink:0}
+.logo:hover{filter:brightness(1.2)}
+.scrollbox thead th{position:sticky;top:0;z-index:1}
 .risk{border-radius:6px;display:inline-block;min-width:54px;text-align:center;padding:2px 6px;font-weight:700;border:1px solid var(--line2);background:var(--card2)}
 </style>
 </head>
@@ -720,7 +723,7 @@ function vBrandRank(){
  <p class="small mut">Points gagnés par les athlètes de chaque marque (toi compris) : victoire 10, 2e 7, 3e 5, top 10 2 — ×2 sur la Finale, ×1,5 sur un Major ou une grande classique. Les marques du podium paient 15 % de plus leurs nouveaux contrats.</p>
  <div class="chips" style="margin-bottom:8px">${Object.entries(SPONSOR_CATS).map(([k,c])=>`<button class="sm ${SP_CAT===k?'pri':''}" onclick="SP_CAT='${k}';UI.bpp=0;render()">${c.i} ${c.n}</button>`).join('')}</div>
  ${(()=>{UI._bp=pager('bpp',rows.length,10);return'';})()}<table><tr><th>#</th><th>Marque</th><th>Athlètes</th><th>Victoires</th><th>Podiums</th><th>Points</th></tr>
- ${rows.slice(UI._bp.s,UI._bp.e).map((r,k)=>{const i=UI._bp.s+k;return `<tr ${r.me?'style="background:var(--tint)"':''}><td>${i+1}</td><td><b>${esc(r.b)}</b> <span class="small mut">${'★'.repeat(r.t)}</span>${r.me?' <span class="badge">ton sponsor</span>':''}</td><td class="small">${r.ath.length?r.ath.slice(0,4).map(p=>`<span class="click" onclick="openPro('${p.id}')">${p.flag} ${esc(p.last)}</span>`).join(', ')+(r.ath.length>4?' +'+(r.ath.length-4):''):'—'}${r.me?' + toi':''}</td><td>${r.w}</td><td>${r.p}</td><td><b>${Math.round(r.pts)}</b></td></tr>`;}).join('')}</table>${UI._bp.html}</div>`;
+ ${rows.slice(UI._bp.s,UI._bp.e).map((r,k)=>{const i=UI._bp.s+k;return `<tr ${r.me?'style="background:var(--tint)"':''}><td>${i+1}</td><td style="white-space:nowrap">${logo('brand',r.b,r.b,24)}<b>${esc(r.b)}</b> <span class="small mut">${'★'.repeat(r.t)}</span>${r.me?' <span class="badge">ton sponsor</span>':''}</td><td class="small">${r.ath.length?r.ath.slice(0,4).map(p=>`<span class="click" onclick="openPro('${p.id}')">${p.flag} ${esc(p.last)}</span>`).join(', ')+(r.ath.length>4?' +'+(r.ath.length-4):''):'—'}${r.me?' + toi':''}</td><td>${r.w}</td><td>${r.p}</td><td><b>${Math.round(r.pts)}</b></td></tr>`;}).join('')}</table>${UI._bp.html}</div>`;
 }
 function brandBonus(cat,brand){const r=brandTable(cat).findIndex(x=>x.b===brand);return r>=0&&r<3&&(((S.brandPts||{})[S.season]||{})[brand]||{}).pts?1.15:1;}
 // ---------- inscriptions / forfaits de dernière minute ----------
@@ -784,11 +787,11 @@ function vIndex(){
   <div class="row" style="margin-bottom:8px">${[['gen','Général'],...CATS.map(c=>[c,c])].map(([k,n])=>`<button class="sm ${cat===k?'pri':''}" onclick="RK.cat='${k}';UI.rkp=0;render()">${n}</button>`).join('')}
    <span style="flex:1"></span>${[['H','Hommes'],['F','Femmes'],['all','Tous']].map(([k,n])=>`<button class="sm ${sex===k?'pri':''}" onclick="RK.sex='${k}';UI.rkp=0;render()">${n}</button>`).join('')}</div>
   <input id="rkq" placeholder="🔎 Rechercher un coureur (nom, pays…) — clic sur un nom = sa fiche" value="${esc(RK.q)}" style="width:100%;margin-bottom:8px" oninput="RK.q=this.value;UI.rkp=0;document.getElementById('rkBody').innerHTML=rankRows();document.getElementById('rkPg').innerHTML=RK.pg">
-  <div style="overflow:auto"><table><thead><tr><th>#</th><th>Coureur</th><th>Âge</th><th>Index</th><th>Profil</th><th>Dernière course ${S.season}</th><th>Prochaine</th></tr></thead><tbody id="rkBody">${rankRows()}</tbody></table></div><div id="rkPg">${RK.pg}</div>
+  <div class="scrollbox" style="overflow:auto;height:calc(100vh - 455px);min-height:200px;border:1px solid var(--line);border-radius:8px"><table><thead><tr><th>#</th><th>Coureur</th><th>Âge</th><th>Index</th><th>Profil</th><th>Dernière course ${S.season}</th><th>Prochaine</th></tr></thead><tbody id="rkBody">${rankRows()}</tbody></table></div><div id="rkPg">${RK.pg}</div>
   </div>`;
  return ih+(it==='me'?A:B);
 }
-function rankRows(){const q=norm(RK.q||'');const L=RK.rows.filter(r=>!q||norm(r.n+' '+r.nat).includes(q));const pg=pager('rkp',L.length,innerHeight<860?6:9);RK.pg=pg.html.replace(/render\(\)/g,"document.getElementById('rkBody').innerHTML=rankRows();document.getElementById('rkPg').innerHTML=RK.pg");return L.slice(pg.s,pg.e).map(r=>`<tr class="click" onclick="${r.me?"TAB='prof';render()":"openPro('"+r.id+"')"}" ${r.me?'style="background:var(--tint)"':''}><td>${r.rk}</td><td style="white-space:nowrap">${r.me?'<b class="warn">'+esc(r.n)+'</b>':esc(r.n)}</td><td>${r.age}</td><td><b>${r.v}</b></td><td class="small">${r.spec}</td><td class="small">${esc(r.last)}</td><td class="small">${r.next?esc(EVMAP[r.next.e].name.replace(/ by UTMB|HOKA /g,''))+' · '+esc(getF(r.next.e,r.next.c).name)+' (S'+(r.next.w+1)+')':''}</td></tr>`).join('')||'<tr><td colspan="7" class="mut">Aucun coureur trouvé.</td></tr>';
+function rankRows(){const q=norm(RK.q||'');const L=RK.rows.filter(r=>!q||norm(r.n+' '+r.nat).includes(q));const pg={s:0,e:L.length,html:''};RK.pg=pg.html.replace(/render\(\)/g,"document.getElementById('rkBody').innerHTML=rankRows();document.getElementById('rkPg').innerHTML=RK.pg");return L.slice(pg.s,pg.e).map(r=>`<tr class="click" onclick="${r.me?"TAB='prof';render()":"openPro('"+r.id+"')"}" ${r.me?'style="background:var(--tint)"':''}><td>${r.rk}</td><td style="white-space:nowrap">${r.me?'<b class="warn">'+esc(r.n)+'</b>':esc(r.n)}</td><td>${r.age}</td><td><b>${r.v}</b></td><td class="small">${r.spec}</td><td class="small">${esc(r.last)}</td><td class="small">${r.next?esc(EVMAP[r.next.e].name.replace(/ by UTMB|HOKA /g,''))+' · '+esc(getF(r.next.e,r.next.c).name)+' (S'+(r.next.w+1)+')':''}</td></tr>`).join('')||'<tr><td colspan="7" class="mut">Aucun coureur trouvé.</td></tr>';
 }
 
 const EVMAP=Object.fromEntries(EVENTS.map(e=>[e.id,e]));
@@ -812,7 +815,7 @@ function evDateLabel(e){return (e.dEst?'≈ ':'')+(e.dLabel||(e.d+' '+MONTHS[e.m
 
 // ---------- état ----------
 let S=null, TAB='home', CAL_FILTER={cat:'all',reg:'all'};
-const APP_VERSION='2026-11-18-c';
+const APP_VERSION='2026-11-18-d';
 const SAVE_KEY='ultraTrailManager_v1';
 // ---------- sauvegardes multiples (une par carrière) ----------
 const IDX_KEY='utm_careers_v1',SLOT=id=>'utm_career_'+id;
@@ -1152,6 +1155,21 @@ function stabs(key,items){if(!UI[key]||!items.some(i=>i[0]===UI[key]))UI[key]=it
  return[UI[key],`<div class="stabs" style="grid-template-columns:repeat(${items.length},1fr)">${items.map(([id,l])=>`<button class="${UI[key]===id?'on':''}" onclick="UI['${key}']='${id}';render()">${l}</button>`).join('')}</div>`];}
 function pager(key,total,per){const pages=Math.max(1,Math.ceil(total/per));const p=clamp(UI[key]||0,0,pages-1);UI[key]=p;
  return{s:p*per,e:p*per+per,html:pages>1?`<div class="pager"><button class="sm" ${p?'':'disabled'} onclick="UI['${key}']=${p-1};render()">◀</button><span class="small mut">Page ${p+1} / ${pages}</span><button class="sm" ${p<pages-1?'':'disabled'} onclick="UI['${key}']=${p+1};render()">▶</button></div>`:''};}
+// ---------- logos : badges générés, ou ta propre image (clic sur un logo) ----------
+const LOGO_KEY='utm_logos';let LOGOS={};try{LOGOS=JSON.parse(localStorage.getItem(LOGO_KEY))||{};}catch(e){}
+function initials(n){const w=String(n).replace(/by UTMB|HOKA|®|—.*$/g,'').trim().split(/[\s\-–'’+&]+/).filter(x=>x&&!/^(de|du|des|la|le|les|by|d|of|the|el|del|dels)$/i.test(x));if(!w.length)return'?';return(w.length>1?w[0][0]+w[1][0]:w[0].slice(0,2)).toUpperCase();}
+const TIER_COL={final:['#5a1f2a','#ffb3a6'],major:['#5a4313','#f6cf7a'],event:['#0f4a4a','#7fe3d3'],classic:['#33245a','#c9b4ff'],local:['#2b3a44','#b9cad3']};
+function genBadge(kind,name,size,tier){const ini=initials(name);const fs=Math.round(size*.38);
+ if(kind==='brand'){const h=hash(name)%360;return`<span style="display:inline-grid;place-items:center;width:${size}px;height:${size}px;border-radius:7px;background:hsl(${h} 40% 26%);border:1px solid hsl(${h} 40% 38%);color:hsl(${h} 70% 86%);font-weight:800;font-size:${fs}px">${ini}</span>`;}
+ const [bg,fg]=TIER_COL[tier]||TIER_COL.event;
+ return`<span style="display:inline-grid;place-items:center;width:${size}px;height:${size}px;border-radius:50%;background:${bg};border:2px solid ${fg}55;color:${fg};font-weight:800;font-size:${fs}px;position:relative">${ini}<svg viewBox="0 0 20 8" style="position:absolute;bottom:${Math.round(size*.12)}px;width:${Math.round(size*.55)}px;opacity:.6"><path d="M0 8 L6 2 L9 5 L13 0 L20 8Z" fill="${fg}"/></svg></span>`;}
+function logo(kind,id,name,size,tier){const k=kind+':'+id;const src=LOGOS[k];size=size||26;
+ const inner=src?`<img src="${src}" alt="" style="width:${size}px;height:${size}px;object-fit:contain;border-radius:${kind==='brand'?7:size/2}px;background:#fff">`:genBadge(kind,name,size,tier);
+ return`<span class="logo" data-tip="${esc('<b>'+name+'</b><br>'+(src?'Clique pour changer l\'image (clic droit : retirer)':'Clique pour mettre ta propre image'))}" onclick="event.stopPropagation();pickLogo('${k}')" oncontextmenu="event.preventDefault();event.stopPropagation();delLogo('${k}')">${inner}</span>`;}
+function pickLogo(k){const i=document.createElement('input');i.type='file';i.accept='image/*';
+ i.onchange=()=>{const f=i.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{const img=new Image();img.onload=()=>{const c=document.createElement('canvas'),sz=128;c.width=c.height=sz;const x=c.getContext('2d');const sc=Math.min(sz/img.width,sz/img.height);x.drawImage(img,(sz-img.width*sc)/2,(sz-img.height*sc)/2,img.width*sc,img.height*sc);
+  LOGOS[k]=c.toDataURL('image/png');try{localStorage.setItem(LOGO_KEY,JSON.stringify(LOGOS));}catch(e){toast('Stockage plein : impossible d\'enregistrer l\'image.');}render();};img.src=r.result;};r.readAsDataURL(f);};i.click();}
+function delLogo(k){if(!LOGOS[k])return;delete LOGOS[k];try{localStorage.setItem(LOGO_KEY,JSON.stringify(LOGOS));}catch(e){}render();}
 const TABS={race:['🏁','Course'],home:['🏠','Tableau de bord'],train:['🏃','Entraînement'],agenda:['🗓','Agenda'],mail:['📬','Messagerie'],cal:['📅','Calendrier'],index:['📈','UTMB Index'],prep:['🎯','Objectif & prépa'],spons:['🤝','Sponsors'],staff:['👥','Staff'],prof:['🪪','Profil'],log:['📰','Journal']};
 function render(){
  if(window.hideTip)hideTip();
@@ -1217,7 +1235,7 @@ function vHome(){
     <div><div class="mut small">Risques cette semaine</div><div class="row" style="margin-top:6px"><span class="risk ${riskClass(ir)}" style="background:#0002">🩹 ${pct(ir)}</span><span class="risk ${riskClass(il)}" style="background:#0002">🤒 ${pct(il)}</span></div><div class="small mut">blessure · maladie</div></div>
    </div>
   </div>
-  <div class="card"><h3>Mes prochaines courses</h3>${up.length?`<table>${up.map(r=>{const f=getF(r.e,r.c);return`<tr><td>${weekLabel(r.week)}</td><td><b>${esc(EVMAP[r.e].name)}</b><br><span class="mut small">${esc(f.name)} · ${f.km} km · ${f.dp} D+</span></td><td>${S.goal===r.e+'|'+r.c?'🎯 Objectif':''}</td></tr>`;}).join('')}</table>`:'<p class="mut">Aucune inscription.</p>'}</div>
+  <div class="card"><h3>Mes prochaines courses</h3>${up.length?`<table>${up.map(r=>{const f=getF(r.e,r.c);return`<tr><td>${weekLabel(r.week)}</td><td style="display:flex;align-items:center">${logo('race',r.e,EVMAP[r.e].name,30,EVMAP[r.e].tier)}<div><b>${esc(EVMAP[r.e].name)}</b><br><span class="mut small">${esc(f.name)} · ${f.km} km · ${f.dp} D+</span></div></td><td>${S.goal===r.e+'|'+r.c?'🎯 Objectif':''}</td></tr>`;}).join('')}</table>`:'<p class="mut">Aucune inscription.</p>'}</div>
  </div>
  <div>
   ${tipBox()}
@@ -1389,7 +1407,7 @@ function vRace(){
    ${ent.length?`<p class="small">⭐ Pros inscrits : ${ent.map(p=>`<span class="click" onclick="openPro('${p.id}')">${p.flag} ${esc(p.first)} ${esc(p.last)}</span>`).join(', ')}</p>`:''}
    ${past&&!rows.length&&!dnf.length&&!me?'<p class="small mut">Aucun pro au départ de ce format.</p>':''}</div>`;}).join('');
  return `<div class="row" style="margin-bottom:10px"><button class="sm" onclick="TAB=RV.back||'agenda';render()">← Retour</button></div>
- <div class="card" style="margin-bottom:12px"><h2>${esc(e.name)} ${badge}</h2><div class="mut">${esc(e.place)}, ${esc(e.country)} · ${evDateLabel(e)} ${season} · technicité ${'●'.repeat(e.tech)}${'○'.repeat(5-e.tech)} · ${past?'<b>Terminée</b>':'À venir'}</div></div>${rfh}${fmts}`;
+ <div class="card" style="margin-bottom:12px;display:flex;align-items:center">${logo('race',e.id,e.name,48,e.tier)}<div style="flex:1"><h2 style="border:none;padding:0;margin:0 0 4px">${esc(e.name)} ${badge}</h2><div class="mut">${esc(e.place)}, ${esc(e.country)} · ${evDateLabel(e)} ${season} · technicité ${'●'.repeat(e.tech)}${'○'.repeat(5-e.tech)} · ${past?'<b>Terminée</b>':'À venir'}</div></div></div>${rfh}${fmts}`;
 }
 
 // ---------- calendrier ----------
@@ -1435,8 +1453,8 @@ function vCal(){
  const list=evs.filter(x=>'w'+evWeek(x.e)===cw);const pg=pager(wk+'p',list.length,3);html+=ch;
  for(const {e,fs} of list.slice(pg.s,pg.e)){
   const w=evWeek(e);
-  html+=`<div class="card ev ${w<S.week?'past':''}"><div class="row sp"><div><b class="big click" onclick="RV={e:'${e.id}',season:S.season,back:'cal'};TAB='race';render()">${esc(e.name)} ›</b>${e.tier==='major'?'<span class="badge b-major">MAJOR</span>':''}${e.tier==='final'?'<span class="badge b-final">FINALES</span>':''}${e.isNew?'<span class="badge b-new">Nouveau</span>':''}${e.tier==='local'?'<span class="badge">Course locale · hors index</span>':''}${e.tier==='classic'?'<span class="badge b-major">Grande classique · hors index</span>':''}${e.est?'<span class="badge b-est">≈</span>':''}
-   <div class="mut small">${esc(e.place)}, ${esc(e.country)} · ${evDateLabel(e)} · technicité ${'●'.repeat(e.tech)}${'○'.repeat(5-e.tech)}</div></div><span class="mut small">sem. ${w+1}</span></div>
+  html+=`<div class="card ev ${w<S.week?'past':''}"><div class="row sp"><div style="display:flex;align-items:center">${logo('race',e.id,e.name,38,e.tier)}<div><b class="big click" onclick="RV={e:'${e.id}',season:S.season,back:'cal'};TAB='race';render()">${esc(e.name)} ›</b>${e.tier==='major'?'<span class="badge b-major">MAJOR</span>':''}${e.tier==='final'?'<span class="badge b-final">FINALES</span>':''}${e.isNew?'<span class="badge b-new">Nouveau</span>':''}${e.tier==='local'?'<span class="badge">Course locale · hors index</span>':''}${e.tier==='classic'?'<span class="badge b-major">Grande classique · hors index</span>':''}${e.est?'<span class="badge b-est">≈</span>':''}
+   <div class="mut small">${esc(e.place)}, ${esc(e.country)} · ${evDateLabel(e)} · technicité ${'●'.repeat(e.tech)}${'○'.repeat(5-e.tech)}</div></div></div><span class="mut small">sem. ${w+1}</span></div>
    <table style="margin-top:6px"><tr><th>Format</th><th>Distance</th><th>D+</th><th>D−</th><th>Cat.</th><th>Stones</th><th>Départ</th><th></th></tr>
    ${fs.map(f=>`<tr><td><b>${esc(f.name)}</b>${f.lottery?' <span class="badge">tirage</span>':''}${(()=>{const en=entrants(e,f);return en.length?`<br><span class="small" style="color:var(--acc2)">⭐ ${en.slice(0,6).map(p=>`<span class="click" onclick="openPro('${p.id}')">${p.flag} ${esc(p.last)}</span>`).join(', ')}${en.length>6?' +'+(en.length-6):''}</span>`:''})()}</td><td>${f.km} km</td><td>${f.dp} m</td><td>${f.dm} m</td><td>${catOf(f)}</td><td>${isUTMB(e)?STONES[catOf(f)]*(e.tier==='major'?2:1):'—'}</td><td class="small">${f.day?f.day+' ':''}${defStart(f)}</td><td>${regBtn(e,f)}</td></tr>`).join('')}</table></div>`;
  }
@@ -1469,14 +1487,14 @@ function vSpons(){
  const [t,h]=stabs('sp',[['mine','🤝 Mes contrats ('+S.sponsors.length+')'],['offers','📨 Offres reçues ('+S.offers.length+')'],['rank','🏆 Classement des marques']]);
  if(t==='rank')return h+vBrandRank();
  if(t==='offers'){const pg=pager('spo',S.offers.length,4);
-  return h+`<div class="card"><h2>Offres reçues</h2>${S.offers.length?`<div class="grid g2">${S.offers.slice(pg.s,pg.e).map((o,k)=>{const i=pg.s+k;return`<div class="card"><div class="row sp"><b>${SPONSOR_CATS[o.cat].i} ${esc(o.brand)} ${'★'.repeat(o.tier)}</b><span class="mut small">expire dans ${o.exp} sem.</span></div>
+  return h+`<div class="card"><h2>Offres reçues</h2>${S.offers.length?`<div class="grid g2">${S.offers.slice(pg.s,pg.e).map((o,k)=>{const i=pg.s+k;return`<div class="card"><div class="row sp"><b>${logo('brand',o.brand,o.brand,28)}${esc(o.brand)} ${'★'.repeat(o.tier)}</b><span class="mut small">expire dans ${o.exp} sem.</span></div>
   <div class="small" style="margin-top:6px">${SPONSOR_CATS[o.cat].n} · <b>${money(o.weekly)}/sem.</b> · prime podium ${money(o.bPod)} · prime victoire ${money(o.bWin)}</div>
   <div class="small">Objectif sur 1 an : <b>${OBJECTIVES.find(x=>x.id===o.obj).n}</b></div>
   <div class="small mut">Bonus matériel : ${SPONSOR_CATS[o.cat].perk}</div>
   <div class="row" style="margin-top:8px"><button class="pri sm" onclick="acceptOffer(${i})">Signer</button><button class="sm" onclick="declineOffer(${i})">Refuser</button></div></div>`;}).join('')}</div>${pg.html}`:'<p class="mut">Aucune offre pour l\'instant. Fais des résultats pour attirer les marques !</p>'}</div>`;}
  return h+`<div class="grid g2"><div class="card"><h2>Mes contrats</h2>
  <table><tr><th>Catégorie</th><th>Marque</th><th>€/sem</th><th>Objectif</th><th></th></tr>
- ${Object.entries(SPONSOR_CATS).map(([c,x])=>{const i=S.sponsors.findIndex(s=>s.cat===c);const s=S.sponsors[i];return`<tr><td data-tip="${esc('<b>'+x.n+'</b> — '+x.perk)}">${x.i} ${x.n}</td>${s?`<td><b>${esc(s.brand)}</b> ${'★'.repeat(s.tier)}<br><span class="small mut">${s.left} sem. restantes</span></td><td>${money(s.weekly)}</td><td class="small">${OBJECTIVES.find(o=>o.id===s.obj).n}</td><td><button class="sm" onclick="breakContract(${i})">Rompre</button></td>`:'<td class="mut" colspan="4">—</td>'}</tr>`;}).join('')}
+ ${Object.entries(SPONSOR_CATS).map(([c,x])=>{const i=S.sponsors.findIndex(s=>s.cat===c);const s=S.sponsors[i];return`<tr><td data-tip="${esc('<b>'+x.n+'</b> — '+x.perk)}">${x.i} ${x.n}</td>${s?`<td style="white-space:nowrap">${logo('brand',s.brand,s.brand,24)}<b>${esc(s.brand)}</b> ${'★'.repeat(s.tier)}<br><span class="small mut">${s.left} sem. restantes</span></td><td>${money(s.weekly)}</td><td class="small">${OBJECTIVES.find(o=>o.id===s.obj).n}</td><td><button class="sm" onclick="breakContract(${i})">Rompre</button></td>`:'<td class="mut" colspan="4">—</td>'}</tr>`;}).join('')}
  </table></div><div>${tipBox(2)}<div class="card"><h2>Comment ça marche</h2><p class="small">Les marques te contactent selon ta réputation et tes fans (≥3 : petites marques ★, ≥25 : marques moyennes ★★, ≥60 : grandes marques ★★★). Chaque équipement apporte un bonus en course (survole une catégorie). Les marques du top 3 du classement paient 15 % de plus.</p></div></div></div>`;
 }
 function vStaff(){
@@ -1954,7 +1972,7 @@ function openPro(id){
   <div class="grid g2" style="margin-top:12px"><div><div class="card"><h3>Caractéristiques</h3>${bars}<p class="small mut">Estimées à partir de son niveau et de son profil.</p></div>
   <div class="card" style="margin-top:14px"><h3>🏆 Palmarès</h3>${(PALMARES[id]||[]).length?`<div class="small mut">Carrière réelle (principaux titres)</div><ul class="small">${PALMARES[id].map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`:'<p class="small mut">Palmarès réel non renseigné.</p>'}
    ${(()=>{const g=(S.pros.res[id]||[]).filter(r=>r.place&&r.place<=3&&EVMAP[r.e].tier!=='local').slice().reverse();return g.length?`<div class="small mut" style="margin-top:6px">Dans ta partie</div><ul class="small">${g.map(r=>`<li>${r.place===1?'🥇':r.place===2?'🥈':'🥉'} ${r.season} — ${esc(EVMAP[r.e].name.replace(/ by UTMB|HOKA /g,''))} (${esc(getF(r.e,r.c).name)})</li>`).join('')}</ul>`:'';})()}</div>
-  <div class="card" style="margin-top:14px"><h3>🤝 Sponsors</h3><table>${Object.entries(proSpons(p)).map(([c,b])=>`<tr><td>${SPONSOR_CATS[c].i} ${SPONSOR_CATS[c].n}</td><td><b>${esc(b)}</b>${PRO_SPONS_REAL[id]&&PRO_SPONS_REAL[id][c]?'':' <span class="small mut">*</span>'}</td></tr>`).join('')}</table><p class="small mut">* attribué par le jeu</p></div></div>
+  <div class="card" style="margin-top:14px"><h3>🤝 Sponsors</h3><table>${Object.entries(proSpons(p)).map(([c,b])=>`<tr><td>${SPONSOR_CATS[c].i} ${SPONSOR_CATS[c].n}</td><td>${logo('brand',b,b,20)}<b>${esc(b)}</b>${PRO_SPONS_REAL[id]&&PRO_SPONS_REAL[id][c]?'':' <span class="small mut">*</span>'}</td></tr>`).join('')}</table><p class="small mut">* attribué par le jeu</p></div></div>
   <div class="card"><h3>UTMB Index</h3><div class="grid" style="grid-template-columns:repeat(5,1fr);gap:8px">${['gen',...CATS].map(c=>`<div data-tip="${esc(c==='gen'?'<b>Index général</b> — Son meilleur index de catégorie.':'<b>Index '+c+'</b> — Moyenne de ses 3 meilleures perfs '+c+' sur le circuit UTMB (2 dernières saisons). Sans résultat récent, on part de son niveau de référence.')}"><div class="mut small">${c==='gen'?'Général':c}</div><div class="kpi">${c==='gen'?proGen(p):proIdx(p,c)}</div></div>`).join('')}</div>
    <h3 style="margin-top:10px">Programme ${S.season}</h3><table>${sch.map(x=>{const e=EVMAP[x.e],f=getF(x.e,x.c);const r=(S.pros.res[id]||[]).find(y=>y.season===S.season&&y.e===x.e&&y.c===x.c);return`<tr><td class="small">${weekLabel(x.w)}</td><td>${esc(e.name.replace(/ by UTMB|HOKA /g,''))}<br><span class="small mut">${esc(f.name)} · ${f.km} km${isUTMB(e)?'':' · locale'}</span></td><td class="small">${r?(r.dnf?'<span class="bad">DNF</span>':fmtT(r.time)+(r.index?' · <b>'+r.index+'</b>':'')):(x.w<S.week?'—':'<span class="mut">à venir</span>')}</td></tr>`;}).join('')}</table>
    ${res.filter(r=>r.season<S.season).length?`<h3 style="margin-top:10px">Saisons passées</h3><table>${res.filter(r=>r.season<S.season).slice(0,8).map(r=>`<tr><td>${r.season}</td><td class="small">${esc(EVMAP[r.e].name)} — ${esc(getF(r.e,r.c).name)}</td><td class="small">${r.dnf?'DNF':fmtT(r.time)}${r.index?' · '+r.index:''}</td></tr>`).join('')}</table>`:''}
