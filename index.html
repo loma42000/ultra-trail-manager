@@ -815,7 +815,7 @@ function evDateLabel(e){return (e.dEst?'≈ ':'')+(e.dLabel||(e.d+' '+MONTHS[e.m
 
 // ---------- état ----------
 let S=null, TAB='home', CAL_FILTER={cat:'all',reg:'all'};
-const APP_VERSION='2026-11-18-g';
+const APP_VERSION='2026-11-18-h';
 const SAVE_KEY='ultraTrailManager_v1';
 // ---------- sauvegardes multiples (une par carrière) ----------
 const IDX_KEY='utm_careers_v1',SLOT=id=>'utm_career_'+id;
@@ -1219,7 +1219,7 @@ function openBrand(b){
  const ath=PROS.filter(p=>Object.values(proSpons(p)).includes(b));
  const mine=S.sponsors.filter(s=>s.brand===b),offs=S.offers.filter(o=>o.brand===b);
  const m=document.getElementById('modal');m.className='modal';
- m.innerHTML=`<div class="mbox" style="max-width:900px"><div class="row sp"><div style="display:flex;align-items:center">${logo('brand',b,b,150)}<div><h2 style="border:none;padding:0;margin:0;font-size:22px;text-transform:none;letter-spacing:0">${esc(b)} <span class="mut small">${'★'.repeat(tier)}</span></h2>
+ m.innerHTML=`<div class="mbox" style="max-width:900px"><div class="row sp"><div style="display:flex;align-items:center">${logo('brand',b,b,104)}<div><h2 style="border:none;padding:0;margin:0;font-size:22px;text-transform:none;letter-spacing:0">${esc(b)} <span class="mut small">${'★'.repeat(tier)}</span></h2>
   <div class="mut">${inf?esc(inf.o)+' · ':''}${cats.map(c=>SPONSOR_CATS[c].i+' '+SPONSOR_CATS[c].n).join(' · ')}</div></div></div><button onclick="closeModal()">✕</button></div>
   <div class="grid g2" style="margin-top:14px"><div class="card"><h2>Dans le trail</h2><p>${inf?esc(inf.h):'Marque présente sur le circuit trail. Pas encore de fiche détaillée.'}</p>
    ${inf&&inf.m.length?`<h3 style="margin-top:12px">Modèles phares</h3><div class="row">${inf.m.map(x=>`<span class="pill">${esc(x)}</span>`).join('')}</div>`:''}
@@ -1242,7 +1242,7 @@ function logo(kind,id,name,size,tier){const k=kind+':'+id;const src=LOGOS[k];siz
  const inner=src?`<img src="${src}" alt="" style="width:${size}px;height:${size}px;object-fit:contain;border-radius:${kind==='brand'?7:size/2}px;background:#fff">`:genBadge(kind,name,size,tier);
  return`<span class="logo" data-tip="${esc('<b>'+name+'</b><br>'+(src?'Clique pour changer l\'image (clic droit : retirer)':'Clique pour mettre ta propre image'))}" onclick="event.stopPropagation();pickLogo('${k}')" oncontextmenu="event.preventDefault();event.stopPropagation();delLogo('${k}')">${inner}</span>`;}
 function pickLogo(k){const i=document.createElement('input');i.type='file';i.accept='image/*';
- i.onchange=()=>{const f=i.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{const img=new Image();img.onload=()=>{const c=document.createElement('canvas'),sz=128;c.width=c.height=sz;const x=c.getContext('2d');const sc=Math.min(sz/img.width,sz/img.height);x.drawImage(img,(sz-img.width*sc)/2,(sz-img.height*sc)/2,img.width*sc,img.height*sc);
+ i.onchange=()=>{const f=i.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{const img=new Image();img.onload=()=>{const c=document.createElement('canvas'),sz=256;c.width=c.height=sz;const x=c.getContext('2d');x.imageSmoothingQuality='high';const sc=Math.min(sz/img.width,sz/img.height);x.drawImage(img,(sz-img.width*sc)/2,(sz-img.height*sc)/2,img.width*sc,img.height*sc);
   LOGOS[k]=c.toDataURL('image/png');try{localStorage.setItem(LOGO_KEY,JSON.stringify(LOGOS));}catch(e){toast('Stockage plein : impossible d\'enregistrer l\'image.');}render();};img.src=r.result;};r.readAsDataURL(f);};i.click();}
 function delLogo(k){if(!LOGOS[k])return;delete LOGOS[k];try{localStorage.setItem(LOGO_KEY,JSON.stringify(LOGOS));}catch(e){}render();}
 const TABS={race:['🏁','Course'],home:['🏠','Tableau de bord'],train:['🏃','Entraînement'],agenda:['🗓','Agenda'],mail:['📬','Messagerie'],cal:['📅','Calendrier'],index:['📈','UTMB Index'],prep:['🎯','Objectif & prépa'],spons:['🤝','Sponsors'],staff:['👥','Staff'],prof:['🪪','Profil'],log:['📰','Journal']};
@@ -1482,7 +1482,7 @@ function vRace(){
    ${ent.length?`<p class="small">⭐ Pros inscrits : ${ent.map(p=>`<span class="click" onclick="openPro('${p.id}')">${p.flag} ${esc(p.first)} ${esc(p.last)}</span>`).join(', ')}</p>`:''}
    ${past&&!rows.length&&!dnf.length&&!me?'<p class="small mut">Aucun pro au départ de ce format.</p>':''}</div>`;}).join('');
  return `<div class="row" style="margin-bottom:10px"><button class="sm" onclick="TAB=RV.back||'agenda';render()">← Retour</button></div>
- <div class="card" style="margin-bottom:12px;display:flex;align-items:center">${logo('race',e.id,e.name,120,e.tier)}<div style="flex:1"><h2 style="border:none;padding:0;margin:0 0 4px">${esc(e.name)} ${badge}</h2><div class="mut">${esc(e.place)}, ${esc(e.country)} · ${evDateLabel(e)} ${season} · technicité ${'●'.repeat(e.tech)}${'○'.repeat(5-e.tech)} · ${past?'<b>Terminée</b>':'À venir'}</div></div></div>${rfh}${fmts}`;
+ <div class="card" style="margin-bottom:12px;display:flex;align-items:center">${logo('race',e.id,e.name,88,e.tier)}<div style="flex:1"><h2 style="border:none;padding:0;margin:0 0 4px">${esc(e.name)} ${badge}</h2><div class="mut">${esc(e.place)}, ${esc(e.country)} · ${evDateLabel(e)} ${season} · technicité ${'●'.repeat(e.tech)}${'○'.repeat(5-e.tech)} · ${past?'<b>Terminée</b>':'À venir'}</div></div></div>${rfh}${fmts}`;
 }
 
 // ---------- calendrier ----------
