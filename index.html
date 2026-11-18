@@ -815,7 +815,7 @@ function evDateLabel(e){return (e.dEst?'≈ ':'')+(e.dLabel||(e.d+' '+MONTHS[e.m
 
 // ---------- état ----------
 let S=null, TAB='home', CAL_FILTER={cat:'all',reg:'all'};
-const APP_VERSION='2026-11-18-h';
+const APP_VERSION='2026-11-18-i';
 const SAVE_KEY='ultraTrailManager_v1';
 // ---------- sauvegardes multiples (une par carrière) ----------
 const IDX_KEY='utm_careers_v1',SLOT=id=>'utm_career_'+id;
@@ -1238,9 +1238,9 @@ function genBadge(kind,name,size,tier){const ini=initials(name);const fs=Math.ro
  if(kind==='brand'){const h=hash(name)%360;return`<span style="display:inline-grid;place-items:center;width:${size}px;height:${size}px;border-radius:7px;background:hsl(${h} 40% 26%);border:1px solid hsl(${h} 40% 38%);color:hsl(${h} 70% 86%);font-weight:800;font-size:${fs}px">${ini}</span>`;}
  const [bg,fg]=TIER_COL[tier]||TIER_COL.event;
  return`<span style="display:inline-grid;place-items:center;width:${size}px;height:${size}px;border-radius:50%;background:${bg};border:2px solid ${fg}55;color:${fg};font-weight:800;font-size:${fs}px;position:relative">${ini}<svg viewBox="0 0 20 8" style="position:absolute;bottom:${Math.round(size*.12)}px;width:${Math.round(size*.55)}px;opacity:.6"><path d="M0 8 L6 2 L9 5 L13 0 L20 8Z" fill="${fg}"/></svg></span>`;}
-function logo(kind,id,name,size,tier){const k=kind+':'+id;const src=LOGOS[k];size=size||26;
+function logo(kind,id,name,size,tier){const k=kind+':'+id;const kj=esc(k.replace(/\\/g,'\\\\').replace(/'/g,"\\'"));const src=LOGOS[k];size=size||26;
  const inner=src?`<img src="${src}" alt="" style="width:${size}px;height:${size}px;object-fit:contain;border-radius:${kind==='brand'?7:size/2}px;background:#fff">`:genBadge(kind,name,size,tier);
- return`<span class="logo" data-tip="${esc('<b>'+name+'</b><br>'+(src?'Clique pour changer l\'image (clic droit : retirer)':'Clique pour mettre ta propre image'))}" onclick="event.stopPropagation();pickLogo('${k}')" oncontextmenu="event.preventDefault();event.stopPropagation();delLogo('${k}')">${inner}</span>`;}
+ return`<span class="logo" data-tip="${esc('<b>'+name+'</b><br>'+(src?'Clique pour changer l\'image (clic droit : retirer)':'Clique pour mettre ta propre image'))}" onclick="event.stopPropagation();pickLogo('${kj}')" oncontextmenu="event.preventDefault();event.stopPropagation();delLogo('${kj}')">${inner}</span>`;}
 function pickLogo(k){const i=document.createElement('input');i.type='file';i.accept='image/*';
  i.onchange=()=>{const f=i.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{const img=new Image();img.onload=()=>{const c=document.createElement('canvas'),sz=256;c.width=c.height=sz;const x=c.getContext('2d');x.imageSmoothingQuality='high';const sc=Math.min(sz/img.width,sz/img.height);x.drawImage(img,(sz-img.width*sc)/2,(sz-img.height*sc)/2,img.width*sc,img.height*sc);
   LOGOS[k]=c.toDataURL('image/png');try{localStorage.setItem(LOGO_KEY,JSON.stringify(LOGOS));}catch(e){toast('Stockage plein : impossible d\'enregistrer l\'image.');}render();};img.src=r.result;};r.readAsDataURL(f);};i.click();}
