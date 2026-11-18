@@ -167,7 +167,7 @@ label.f input,label.f select{color:var(--txt);text-transform:none;letter-spacing
  .rolelist .click{padding:6px 9px;margin-bottom:4px}.log div{padding:5px 0}
  .footer .in{padding:7px 20px}.sess{padding:6px 9px}
 }
-.logo{display:inline-flex;vertical-align:middle;margin-right:8px;cursor:pointer;flex-shrink:0}
+.logo{display:inline-flex;vertical-align:middle;margin-right:10px;cursor:pointer;flex-shrink:0}
 .logo:hover{filter:brightness(1.2)}
 .scrollbox thead th{position:sticky;top:0;z-index:1}
 .risk{border-radius:6px;display:inline-block;min-width:54px;text-align:center;padding:2px 6px;font-weight:700;border:1px solid var(--line2);background:var(--card2)}
@@ -722,8 +722,8 @@ function vBrandRank(){
  return `<div class="card"><h2>Classement des sponsors ${S.season}</h2>
  <p class="small mut">Points gagnés par les athlètes de chaque marque (toi compris) : victoire 10, 2e 7, 3e 5, top 10 2 — ×2 sur la Finale, ×1,5 sur un Major ou une grande classique. Les marques du podium paient 15 % de plus leurs nouveaux contrats.</p>
  <div class="chips" style="margin-bottom:8px">${Object.entries(SPONSOR_CATS).map(([k,c])=>`<button class="sm ${SP_CAT===k?'pri':''}" onclick="SP_CAT='${k}';UI.bpp=0;render()">${c.i} ${c.n}</button>`).join('')}</div>
- ${(()=>{UI._bp=pager('bpp',rows.length,10);return'';})()}<table><tr><th>#</th><th>Marque</th><th>Athlètes</th><th>Victoires</th><th>Podiums</th><th>Points</th></tr>
- ${rows.slice(UI._bp.s,UI._bp.e).map((r,k)=>{const i=UI._bp.s+k;return `<tr ${r.me?'style="background:var(--tint)"':''}><td>${i+1}</td><td style="white-space:nowrap">${logo('brand',r.b,r.b,24)}<b>${esc(r.b)}</b> <span class="small mut">${'★'.repeat(r.t)}</span>${r.me?' <span class="badge">ton sponsor</span>':''}</td><td class="small">${r.ath.length?r.ath.slice(0,4).map(p=>`<span class="click" onclick="openPro('${p.id}')">${p.flag} ${esc(p.last)}</span>`).join(', ')+(r.ath.length>4?' +'+(r.ath.length-4):''):'—'}${r.me?' + toi':''}</td><td>${r.w}</td><td>${r.p}</td><td><b>${Math.round(r.pts)}</b></td></tr>`;}).join('')}</table>${UI._bp.html}</div>`;
+ ${(()=>{UI._bp=pager('bpp',rows.length,innerHeight<860?5:7);return'';})()}<table><tr><th>#</th><th>Marque</th><th>Athlètes</th><th>Victoires</th><th>Podiums</th><th>Points</th></tr>
+ ${rows.slice(UI._bp.s,UI._bp.e).map((r,k)=>{const i=UI._bp.s+k;return `<tr ${r.me?'style="background:var(--tint)"':''}><td>${i+1}</td><td style="white-space:nowrap">${logo('brand',r.b,r.b,38)}<b class="click" onclick="openBrand('${r.b.replace(/'/g,"\\'")}')">${esc(r.b)}</b> <span class="small mut">${'★'.repeat(r.t)}</span>${r.me?' <span class="badge">ton sponsor</span>':''}</td><td class="small">${r.ath.length?r.ath.slice(0,4).map(p=>`<span class="click" onclick="openPro('${p.id}')">${p.flag} ${esc(p.last)}</span>`).join(', ')+(r.ath.length>4?' +'+(r.ath.length-4):''):'—'}${r.me?' + toi':''}</td><td>${r.w}</td><td>${r.p}</td><td><b>${Math.round(r.pts)}</b></td></tr>`;}).join('')}</table>${UI._bp.html}</div>`;
 }
 function brandBonus(cat,brand){const r=brandTable(cat).findIndex(x=>x.b===brand);return r>=0&&r<3&&(((S.brandPts||{})[S.season]||{})[brand]||{}).pts?1.15:1;}
 // ---------- inscriptions / forfaits de dernière minute ----------
@@ -815,7 +815,7 @@ function evDateLabel(e){return (e.dEst?'≈ ':'')+(e.dLabel||(e.d+' '+MONTHS[e.m
 
 // ---------- état ----------
 let S=null, TAB='home', CAL_FILTER={cat:'all',reg:'all'};
-const APP_VERSION='2026-11-18-d';
+const APP_VERSION='2026-11-18-e';
 const SAVE_KEY='ultraTrailManager_v1';
 // ---------- sauvegardes multiples (une par carrière) ----------
 const IDX_KEY='utm_careers_v1',SLOT=id=>'utm_career_'+id;
@@ -1155,6 +1155,81 @@ function stabs(key,items){if(!UI[key]||!items.some(i=>i[0]===UI[key]))UI[key]=it
  return[UI[key],`<div class="stabs" style="grid-template-columns:repeat(${items.length},1fr)">${items.map(([id,l])=>`<button class="${UI[key]===id?'on':''}" onclick="UI['${key}']='${id}';render()">${l}</button>`).join('')}</div>`];}
 function pager(key,total,per){const pages=Math.max(1,Math.ceil(total/per));const p=clamp(UI[key]||0,0,pages-1);UI[key]=p;
  return{s:p*per,e:p*per+per,html:pages>1?`<div class="pager"><button class="sm" ${p?'':'disabled'} onclick="UI['${key}']=${p-1};render()">◀</button><span class="small mut">Page ${p+1} / ${pages}</span><button class="sm" ${p<pages-1?'':'disabled'} onclick="UI['${key}']=${p+1};render()">▶</button></div>`:''};}
+// ---------- fiches marques (infos générales, à compléter librement) ----------
+const BRAND_INFO={
+ 'Hoka':{o:'Annecy, France · 2009',h:'Fondée par deux anciens de Salomon, Nicolas Mermoud et Jean-Luc Diard, la marque lance les semelles « maximalistes », très amorties, longtemps moquées puis copiées par tout le monde. Rachetée par le groupe américain Deckers en 2013, elle est aujourd\'hui partenaire titre du HOKA UTMB Mont-Blanc.',m:['Speedgoat','Mafate Speed','Tecton X','Challenger ATR']},
+ 'Salomon':{o:'Annecy, France · 1947',h:'Né dans le ski, Salomon se lance dans la chaussure de trail au tournant des années 2000 et devient la référence du sport avec sa gamme compétition S/LAB et une équipe d\'athlètes historique.',m:['Speedcross','S/LAB Ultra','Sense Ride','S/LAB Genesis']},
+ 'NNormal':{o:'Majorque, Espagne · 2022',h:'Marque cofondée par Kilian Jornet et le fabricant Camper, avec un discours fort sur la durabilité : chaussures réparables et conçues pour durer.',m:['Kjerag','Tomir','Kboix']},
+ 'Nike Trail':{o:'Oregon, États-Unis',h:'Héritière de la ligne outdoor ACG, la gamme trail de Nike s\'est fait une place sur les ultras américains et européens avec ses mousses issues de la route.',m:['Pegasus Trail','Zegama','Ultrafly']},
+ 'adidas Terrex':{o:'Herzogenaurach, Allemagne',h:'Gamme outdoor d\'adidas, développée dans les années 2010, qui a percé en trail avec des chaussures rapides et une équipe d\'athlètes internationale.',m:['Agravic Speed','Speed Ultra','Agravic Ultra']},
+ 'The North Face':{o:'San Francisco, États-Unis · 1966',h:'Marque historique de l\'outdoor, très tôt présente sur l\'ultra avec une équipe d\'athlètes de premier plan. Sa plateforme VECTIV a relancé sa gamme de chaussures.',m:['Summit Vectiv','Enduris','Flight Vectiv']},
+ 'La Sportiva':{o:'Trentin, Italie · 1928',h:'Spécialiste des chaussures de montagne et d\'escalade, réputée pour l\'accroche et la précision en terrain technique.',m:['Bushido','Mutant','Prodigio','Cyklon']},
+ 'Scarpa':{o:'Asolo, Italie · 1938',h:'Fabricant italien de chaussures de montagne et de ski-alpinisme, présent en trail avec des modèles taillés pour la montagne.',m:['Spin','Ribelle Run','Golden Gate']},
+ 'Saucony':{o:'Pennsylvanie, États-Unis · 1898',h:'Marque centenaire de la course sur route, connue en trail pour la Peregrine, une valeur sûre polyvalente.',m:['Peregrine','Xodus','Endorphin Edge']},
+ 'Asics':{o:'Kobe, Japon · 1949',h:'Géant japonais de la course à pied, présent en trail avec des modèles amortis et une gamme compétition récente.',m:['Trabuco','Fujispeed','Metafuji Trail']},
+ 'Brooks':{o:'Seattle, États-Unis · 1914',h:'Spécialiste du running, connu en trail pour la Cascadia, modèle robuste et stable décliné depuis de nombreuses versions.',m:['Cascadia','Catamount','Caldera']},
+ 'On':{o:'Zurich, Suisse · 2010',h:'Marque suisse au design reconnaissable (semelle « CloudTec »), arrivée en trail avec des modèles pour l\'ultra.',m:['Cloudultra','Cloudventure','Cloudvista']},
+ 'Altra':{o:'Utah, États-Unis · 2011',h:'Pionnière du drop zéro et de l\'avant-pied large, très populaire chez les ultra-traileurs américains.',m:['Lone Peak','Olympus','Mont Blanc']},
+ 'Inov-8':{o:'Angleterre · 2003',h:'Née dans le fell running britannique, la marque mise sur l\'accroche et la légèreté pour les terrains gras et techniques.',m:['Trailroc','X-Talon','Trailfly']},
+ 'Kiprun':{o:'France (Decathlon)',h:'Marque running de Decathlon, qui propose du matériel de trail performant à prix accessibles.',m:['Gamme trail MT/XT']},
+ 'Merrell':{o:'Utah, États-Unis · 1981',h:'Célèbre pour la randonnée, Merrell développe aussi une gamme trail running.',m:['Agility Peak','MTL Long Sky']},
+ 'Mizuno':{o:'Osaka, Japon · 1906',h:'Marque japonaise historique, présente en trail avec ses modèles Wave.',m:['Wave Daichi','Wave Mujin']},
+ 'Arc\'teryx':{o:'Vancouver, Canada · 1989',h:'Référence haut de gamme de l\'alpinisme, la marque a développé une ligne trail légère et technique.',m:['Norvan']},
+ 'Patagonia':{o:'Californie, États-Unis · 1973',h:'Marque engagée pour l\'environnement, présente en trail avec des vêtements légers et durables.',m:['Gamme Strider / Airshed']},
+ 'Dynafit':{o:'Autriche',h:'Issue du ski-alpinisme, Dynafit habille et chausse les coureurs de montagne avec une philosophie « speed ».',m:['Ultra','Alpine','Feline']},
+ 'Compressport':{o:'Suisse',h:'Spécialiste de la compression, devenu un équipementier textile majeur de l\'ultra-trail.',m:['Manchons de compression','Trail Postural']},
+ 'Mountain Hardwear':{o:'Californie, États-Unis · 1993',h:'Marque d\'alpinisme qui propose aussi des vêtements techniques pour la course en montagne.',m:[]},
+ 'Raidlight':{o:'Chartreuse, France · 1999',h:'Créée par le traileur Benoît Laval, Raidlight a été pionnière des sacs et gilets de trail et du matériel d\'ultra.',m:['Gilets Responsiv','Vestes Ultra']},
+ 'Odlo':{o:'Norvège · 1946',h:'Spécialiste norvégien des sous-vêtements techniques et du textile sport.',m:[]},
+ 'Ultimate Direction':{o:'États-Unis · 1985',h:'Pionnière des gilets d\'hydratation, popularisés par des signatures d\'ultra-traileurs américains.',m:['Gilets Race Vest']},
+ 'Black Diamond':{o:'Utah, États-Unis · 1989',h:'Marque d\'escalade et d\'alpinisme, très présente en trail avec ses bâtons pliants et ses frontales.',m:['Bâtons Distance Carbon Z','Frontale Spot']},
+ 'Nathan':{o:'États-Unis',h:'Spécialiste des accessoires d\'hydratation et de visibilité pour la course à pied.',m:['Gilets et flasques']},
+ 'Coros':{o:'Chine · 2014',h:'Marque de montres GPS réputée pour son autonomie et sa simplicité, adoptée par de nombreux traileurs de haut niveau.',m:['Vertix','Apex','Pace','Nomad']},
+ 'Garmin':{o:'Kansas, États-Unis · 1989',h:'Leader des montres GPS sportives, incontournable sur les poignets des traileurs.',m:['Fenix','Forerunner','Enduro']},
+ 'Suunto':{o:'Finlande · 1936',h:'Spécialiste finlandais des instruments de plein air puis des montres outdoor, présent depuis longtemps en ultra.',m:['Vertical','Race','9 Peak']},
+ 'Polar':{o:'Finlande · 1977',h:'Pionnier du cardiofréquencemètre, Polar propose des montres orientées outdoor.',m:['Grit X','Vantage']},
+ 'Amazfit':{o:'Chine',h:'Marque de montres connectées au bon rapport qualité-prix.',m:['T-Rex','Balance']},
+ 'Julbo':{o:'Jura, France · 1888',h:'Lunetier jurassien historique de la montagne, connu pour ses verres photochromiques adaptés au trail.',m:['Fury','Ultimate','Rush']},
+ 'Oakley':{o:'Californie, États-Unis · 1975',h:'Lunettes de sport iconiques, très présentes en course à pied et en trail.',m:['Sutro','Radar']},
+ 'Rudy Project':{o:'Italie · 1985',h:'Lunettes et casques de sport italiens, issus du cyclisme et du triathlon.',m:[]},
+ 'Bollé':{o:'Oyonnax, France · 1888',h:'Lunetier français historique, présent dans les sports outdoor.',m:[]},
+ 'Smith':{o:'États-Unis · 1965',h:'Né dans les masques de ski, Smith propose des lunettes de sport techniques.',m:[]},
+ 'Cébé':{o:'Jura, France · 1892',h:'Lunetier jurassien spécialiste de la montagne et du ski.',m:[]},
+ 'Petzl':{o:'Crolles, Isère · années 1970',h:'Référence mondiale de l\'éclairage frontal et du matériel vertical, partenaire incontournable des courses de nuit.',m:['NAO','Swift','IKO Core']},
+ 'Ledlenser':{o:'Allemagne',h:'Spécialiste allemand des lampes et frontales puissantes.',m:[]},
+ 'Silva':{o:'Suède · 1933',h:'Né dans les boussoles d\'orientation, Silva fabrique aussi des frontales conçues pour le trail.',m:['Trail Runner','Trail Speed']},
+ 'Leki':{o:'Allemagne · 1948',h:'Spécialiste allemand des bâtons, avec des modèles pliants ultra-légers pour le trail.',m:['Ultratrail FX.One']},
+ 'Gipron':{o:'Italie',h:'Fabricant italien de bâtons de marche et de trail.',m:[]},
+ 'Komperdell':{o:'Autriche',h:'Fabricant autrichien de bâtons de ski et de randonnée.',m:[]},
+ 'Maurten':{o:'Suède · 2015',h:'A bouleversé la nutrition d\'endurance avec ses boissons et gels à base d\'hydrogel, popularisés sur marathon puis en ultra.',m:['Gel 100','Drink Mix 320']},
+ 'Näak':{o:'Montréal, Canada',h:'Marque de nutrition pensée pour l\'ultra, avec des saveurs salées et sucrées.',m:['Barres et boissons ultra']},
+ 'Overstims':{o:'France',h:'Pionnier français de la nutrition sportive, très présent sur les ravitos et dans les sacs des traileurs.',m:['Gels Antioxydant','Gâteau Sport']},
+ 'Precision Fuel & Hydration':{o:'Royaume-Uni',h:'Spécialiste de l\'hydratation et des apports en sodium personnalisés.',m:['PF 30 Gel','PH 1500']},
+ 'SiS':{o:'Royaume-Uni',h:'Science in Sport, marque britannique de nutrition d\'endurance.',m:['GO Isotonic Gel','Beta Fuel']},
+ 'Tailwind':{o:'Colorado, États-Unis',h:'Boisson « tout-en-un » simple à digérer, très populaire en ultra.',m:['Endurance Fuel']},
+ 'Baouw':{o:'Savoie, France',h:'Barres et purées bio, conçues par des sportifs savoyards.',m:[]},
+ 'Meltonic':{o:'France',h:'Gels et barres bio à base de miel.',m:[]},
+ 'Aptonia':{o:'France (Decathlon)',h:'Marque de nutrition sportive de Decathlon.',m:[]}
+};
+function brandCats(b){return Object.keys(BRANDS).filter(c=>BRANDS[c].some(x=>x[0]===b));}
+function openBrand(b){
+ const cats=brandCats(b);if(!cats.length)return;const tier=Math.max(...cats.map(c=>BRANDS[c].find(x=>x[0]===b)[1]));
+ const inf=BRAND_INFO[b];const pts=((S.brandPts||{})[S.season]||{})[b]||{pts:0,w:0,p:0};
+ const ranks=cats.map(c=>{const t=brandTable(c);return[c,t.findIndex(x=>x.b===b)+1,t.length];});
+ const ath=PROS.filter(p=>Object.values(proSpons(p)).includes(b));
+ const mine=S.sponsors.filter(s=>s.brand===b),offs=S.offers.filter(o=>o.brand===b);
+ const m=document.getElementById('modal');m.className='modal';
+ m.innerHTML=`<div class="mbox" style="max-width:900px"><div class="row sp"><div style="display:flex;align-items:center">${logo('brand',b,b,96)}<div><h2 style="border:none;padding:0;margin:0;font-size:22px;text-transform:none;letter-spacing:0">${esc(b)} <span class="mut small">${'★'.repeat(tier)}</span></h2>
+  <div class="mut">${inf?esc(inf.o)+' · ':''}${cats.map(c=>SPONSOR_CATS[c].i+' '+SPONSOR_CATS[c].n).join(' · ')}</div></div></div><button onclick="closeModal()">✕</button></div>
+  <div class="grid g2" style="margin-top:14px"><div class="card"><h2>Dans le trail</h2><p>${inf?esc(inf.h):'Marque présente sur le circuit trail. Pas encore de fiche détaillée.'}</p>
+   ${inf&&inf.m.length?`<h3 style="margin-top:12px">Modèles phares</h3><div class="row">${inf.m.map(x=>`<span class="pill">${esc(x)}</span>`).join('')}</div>`:''}
+   <p class="small mut" style="margin-top:12px">Infos générales données à titre indicatif.</p></div>
+  <div><div class="card"><h2>Saison ${S.season}</h2><div class="grid g3"><div><div class="mut small">Points</div><div class="kpi">${Math.round(pts.pts)}</div></div><div><div class="mut small">Victoires</div><div class="kpi">${pts.w}</div></div><div><div class="mut small">Podiums</div><div class="kpi">${pts.p}</div></div></div>
+   <p class="small">${ranks.map(([c,r,n])=>`${SPONSOR_CATS[c].n} : <b>${r}e</b>/${n}`).join(' · ')}</p></div>
+   <div class="card" style="margin-top:10px"><h2>Athlètes (${ath.length}${mine.length?' + toi':''})</h2><div class="small">${ath.length?ath.slice(0,14).map(p=>`<span class="click" onclick="openPro('${p.id}')">${p.flag} ${esc(p.first)} ${esc(p.last)}</span>`).join(' · ')+(ath.length>14?' …':''):'Aucun pro sous contrat.'}</div>
+   <p class="small" style="margin-top:10px">${mine.length?'🤝 <b>Ton sponsor</b> ('+mine.map(s=>SPONSOR_CATS[s.cat].n).join(', ')+')':offs.length?'📨 <b>Offre en attente</b> — <span class="click" onclick="closeModal();TAB=\'spons\';UI.sp=\'offers\';render()">voir l\'offre ›</span>':tier>sponsorTierAllowed()?'<span class="mut">Il te faut plus de réputation pour attirer cette marque.</span>':'<span class="mut">Cette marque peut te contacter.</span>'}</p></div></div></div></div>`;
+}
+
 // ---------- logos : badges générés, ou ta propre image (clic sur un logo) ----------
 const LOGO_KEY='utm_logos';let LOGOS={};try{LOGOS=JSON.parse(localStorage.getItem(LOGO_KEY))||{};}catch(e){}
 function initials(n){const w=String(n).replace(/by UTMB|HOKA|®|—.*$/g,'').trim().split(/[\s\-–'’+&]+/).filter(x=>x&&!/^(de|du|des|la|le|les|by|d|of|the|el|del|dels)$/i.test(x));if(!w.length)return'?';return(w.length>1?w[0][0]+w[1][0]:w[0].slice(0,2)).toUpperCase();}
@@ -1235,7 +1310,7 @@ function vHome(){
     <div><div class="mut small">Risques cette semaine</div><div class="row" style="margin-top:6px"><span class="risk ${riskClass(ir)}" style="background:#0002">🩹 ${pct(ir)}</span><span class="risk ${riskClass(il)}" style="background:#0002">🤒 ${pct(il)}</span></div><div class="small mut">blessure · maladie</div></div>
    </div>
   </div>
-  <div class="card"><h3>Mes prochaines courses</h3>${up.length?`<table>${up.map(r=>{const f=getF(r.e,r.c);return`<tr><td>${weekLabel(r.week)}</td><td style="display:flex;align-items:center">${logo('race',r.e,EVMAP[r.e].name,30,EVMAP[r.e].tier)}<div><b>${esc(EVMAP[r.e].name)}</b><br><span class="mut small">${esc(f.name)} · ${f.km} km · ${f.dp} D+</span></div></td><td>${S.goal===r.e+'|'+r.c?'🎯 Objectif':''}</td></tr>`;}).join('')}</table>`:'<p class="mut">Aucune inscription.</p>'}</div>
+  <div class="card"><h3>Mes prochaines courses</h3>${up.length?`<table>${up.map(r=>{const f=getF(r.e,r.c);return`<tr><td>${weekLabel(r.week)}</td><td style="display:flex;align-items:center">${logo('race',r.e,EVMAP[r.e].name,42,EVMAP[r.e].tier)}<div><b>${esc(EVMAP[r.e].name)}</b><br><span class="mut small">${esc(f.name)} · ${f.km} km · ${f.dp} D+</span></div></td><td>${S.goal===r.e+'|'+r.c?'🎯 Objectif':''}</td></tr>`;}).join('')}</table>`:'<p class="mut">Aucune inscription.</p>'}</div>
  </div>
  <div>
   ${tipBox()}
@@ -1407,7 +1482,7 @@ function vRace(){
    ${ent.length?`<p class="small">⭐ Pros inscrits : ${ent.map(p=>`<span class="click" onclick="openPro('${p.id}')">${p.flag} ${esc(p.first)} ${esc(p.last)}</span>`).join(', ')}</p>`:''}
    ${past&&!rows.length&&!dnf.length&&!me?'<p class="small mut">Aucun pro au départ de ce format.</p>':''}</div>`;}).join('');
  return `<div class="row" style="margin-bottom:10px"><button class="sm" onclick="TAB=RV.back||'agenda';render()">← Retour</button></div>
- <div class="card" style="margin-bottom:12px;display:flex;align-items:center">${logo('race',e.id,e.name,48,e.tier)}<div style="flex:1"><h2 style="border:none;padding:0;margin:0 0 4px">${esc(e.name)} ${badge}</h2><div class="mut">${esc(e.place)}, ${esc(e.country)} · ${evDateLabel(e)} ${season} · technicité ${'●'.repeat(e.tech)}${'○'.repeat(5-e.tech)} · ${past?'<b>Terminée</b>':'À venir'}</div></div></div>${rfh}${fmts}`;
+ <div class="card" style="margin-bottom:12px;display:flex;align-items:center">${logo('race',e.id,e.name,80,e.tier)}<div style="flex:1"><h2 style="border:none;padding:0;margin:0 0 4px">${esc(e.name)} ${badge}</h2><div class="mut">${esc(e.place)}, ${esc(e.country)} · ${evDateLabel(e)} ${season} · technicité ${'●'.repeat(e.tech)}${'○'.repeat(5-e.tech)} · ${past?'<b>Terminée</b>':'À venir'}</div></div></div>${rfh}${fmts}`;
 }
 
 // ---------- calendrier ----------
@@ -1453,7 +1528,7 @@ function vCal(){
  const list=evs.filter(x=>'w'+evWeek(x.e)===cw);const pg=pager(wk+'p',list.length,3);html+=ch;
  for(const {e,fs} of list.slice(pg.s,pg.e)){
   const w=evWeek(e);
-  html+=`<div class="card ev ${w<S.week?'past':''}"><div class="row sp"><div style="display:flex;align-items:center">${logo('race',e.id,e.name,38,e.tier)}<div><b class="big click" onclick="RV={e:'${e.id}',season:S.season,back:'cal'};TAB='race';render()">${esc(e.name)} ›</b>${e.tier==='major'?'<span class="badge b-major">MAJOR</span>':''}${e.tier==='final'?'<span class="badge b-final">FINALES</span>':''}${e.isNew?'<span class="badge b-new">Nouveau</span>':''}${e.tier==='local'?'<span class="badge">Course locale · hors index</span>':''}${e.tier==='classic'?'<span class="badge b-major">Grande classique · hors index</span>':''}${e.est?'<span class="badge b-est">≈</span>':''}
+  html+=`<div class="card ev ${w<S.week?'past':''}"><div class="row sp"><div style="display:flex;align-items:center">${logo('race',e.id,e.name,54,e.tier)}<div><b class="big click" onclick="RV={e:'${e.id}',season:S.season,back:'cal'};TAB='race';render()">${esc(e.name)} ›</b>${e.tier==='major'?'<span class="badge b-major">MAJOR</span>':''}${e.tier==='final'?'<span class="badge b-final">FINALES</span>':''}${e.isNew?'<span class="badge b-new">Nouveau</span>':''}${e.tier==='local'?'<span class="badge">Course locale · hors index</span>':''}${e.tier==='classic'?'<span class="badge b-major">Grande classique · hors index</span>':''}${e.est?'<span class="badge b-est">≈</span>':''}
    <div class="mut small">${esc(e.place)}, ${esc(e.country)} · ${evDateLabel(e)} · technicité ${'●'.repeat(e.tech)}${'○'.repeat(5-e.tech)}</div></div></div><span class="mut small">sem. ${w+1}</span></div>
    <table style="margin-top:6px"><tr><th>Format</th><th>Distance</th><th>D+</th><th>D−</th><th>Cat.</th><th>Stones</th><th>Départ</th><th></th></tr>
    ${fs.map(f=>`<tr><td><b>${esc(f.name)}</b>${f.lottery?' <span class="badge">tirage</span>':''}${(()=>{const en=entrants(e,f);return en.length?`<br><span class="small" style="color:var(--acc2)">⭐ ${en.slice(0,6).map(p=>`<span class="click" onclick="openPro('${p.id}')">${p.flag} ${esc(p.last)}</span>`).join(', ')}${en.length>6?' +'+(en.length-6):''}</span>`:''})()}</td><td>${f.km} km</td><td>${f.dp} m</td><td>${f.dm} m</td><td>${catOf(f)}</td><td>${isUTMB(e)?STONES[catOf(f)]*(e.tier==='major'?2:1):'—'}</td><td class="small">${f.day?f.day+' ':''}${defStart(f)}</td><td>${regBtn(e,f)}</td></tr>`).join('')}</table></div>`;
@@ -1487,14 +1562,14 @@ function vSpons(){
  const [t,h]=stabs('sp',[['mine','🤝 Mes contrats ('+S.sponsors.length+')'],['offers','📨 Offres reçues ('+S.offers.length+')'],['rank','🏆 Classement des marques']]);
  if(t==='rank')return h+vBrandRank();
  if(t==='offers'){const pg=pager('spo',S.offers.length,4);
-  return h+`<div class="card"><h2>Offres reçues</h2>${S.offers.length?`<div class="grid g2">${S.offers.slice(pg.s,pg.e).map((o,k)=>{const i=pg.s+k;return`<div class="card"><div class="row sp"><b>${logo('brand',o.brand,o.brand,28)}${esc(o.brand)} ${'★'.repeat(o.tier)}</b><span class="mut small">expire dans ${o.exp} sem.</span></div>
+  return h+`<div class="card"><h2>Offres reçues</h2>${S.offers.length?`<div class="grid g2">${S.offers.slice(pg.s,pg.e).map((o,k)=>{const i=pg.s+k;return`<div class="card"><div class="row sp"><b style="display:flex;align-items:center">${logo('brand',o.brand,o.brand,48)}<span class="click" onclick="openBrand('${o.brand.replace(/'/g,"\\'")}')">${esc(o.brand)}</span>&nbsp;${'★'.repeat(o.tier)}</b><span class="mut small">expire dans ${o.exp} sem.</span></div>
   <div class="small" style="margin-top:6px">${SPONSOR_CATS[o.cat].n} · <b>${money(o.weekly)}/sem.</b> · prime podium ${money(o.bPod)} · prime victoire ${money(o.bWin)}</div>
   <div class="small">Objectif sur 1 an : <b>${OBJECTIVES.find(x=>x.id===o.obj).n}</b></div>
   <div class="small mut">Bonus matériel : ${SPONSOR_CATS[o.cat].perk}</div>
   <div class="row" style="margin-top:8px"><button class="pri sm" onclick="acceptOffer(${i})">Signer</button><button class="sm" onclick="declineOffer(${i})">Refuser</button></div></div>`;}).join('')}</div>${pg.html}`:'<p class="mut">Aucune offre pour l\'instant. Fais des résultats pour attirer les marques !</p>'}</div>`;}
  return h+`<div class="grid g2"><div class="card"><h2>Mes contrats</h2>
  <table><tr><th>Catégorie</th><th>Marque</th><th>€/sem</th><th>Objectif</th><th></th></tr>
- ${Object.entries(SPONSOR_CATS).map(([c,x])=>{const i=S.sponsors.findIndex(s=>s.cat===c);const s=S.sponsors[i];return`<tr><td data-tip="${esc('<b>'+x.n+'</b> — '+x.perk)}">${x.i} ${x.n}</td>${s?`<td style="white-space:nowrap">${logo('brand',s.brand,s.brand,24)}<b>${esc(s.brand)}</b> ${'★'.repeat(s.tier)}<br><span class="small mut">${s.left} sem. restantes</span></td><td>${money(s.weekly)}</td><td class="small">${OBJECTIVES.find(o=>o.id===s.obj).n}</td><td><button class="sm" onclick="breakContract(${i})">Rompre</button></td>`:'<td class="mut" colspan="4">—</td>'}</tr>`;}).join('')}
+ ${Object.entries(SPONSOR_CATS).map(([c,x])=>{const i=S.sponsors.findIndex(s=>s.cat===c);const s=S.sponsors[i];return`<tr><td data-tip="${esc('<b>'+x.n+'</b> — '+x.perk)}">${x.i} ${x.n}</td>${s?`<td style="white-space:nowrap">${logo('brand',s.brand,s.brand,36)}<b class="click" onclick="openBrand('${s.brand.replace(/'/g,"\\'")}')">${esc(s.brand)}</b> ${'★'.repeat(s.tier)}<br><span class="small mut">${s.left} sem. restantes</span></td><td>${money(s.weekly)}</td><td class="small">${OBJECTIVES.find(o=>o.id===s.obj).n}</td><td><button class="sm" onclick="breakContract(${i})">Rompre</button></td>`:'<td class="mut" colspan="4">—</td>'}</tr>`;}).join('')}
  </table></div><div>${tipBox(2)}<div class="card"><h2>Comment ça marche</h2><p class="small">Les marques te contactent selon ta réputation et tes fans (≥3 : petites marques ★, ≥25 : marques moyennes ★★, ≥60 : grandes marques ★★★). Chaque équipement apporte un bonus en course (survole une catégorie). Les marques du top 3 du classement paient 15 % de plus.</p></div></div></div>`;
 }
 function vStaff(){
@@ -1972,7 +2047,7 @@ function openPro(id){
   <div class="grid g2" style="margin-top:12px"><div><div class="card"><h3>Caractéristiques</h3>${bars}<p class="small mut">Estimées à partir de son niveau et de son profil.</p></div>
   <div class="card" style="margin-top:14px"><h3>🏆 Palmarès</h3>${(PALMARES[id]||[]).length?`<div class="small mut">Carrière réelle (principaux titres)</div><ul class="small">${PALMARES[id].map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`:'<p class="small mut">Palmarès réel non renseigné.</p>'}
    ${(()=>{const g=(S.pros.res[id]||[]).filter(r=>r.place&&r.place<=3&&EVMAP[r.e].tier!=='local').slice().reverse();return g.length?`<div class="small mut" style="margin-top:6px">Dans ta partie</div><ul class="small">${g.map(r=>`<li>${r.place===1?'🥇':r.place===2?'🥈':'🥉'} ${r.season} — ${esc(EVMAP[r.e].name.replace(/ by UTMB|HOKA /g,''))} (${esc(getF(r.e,r.c).name)})</li>`).join('')}</ul>`:'';})()}</div>
-  <div class="card" style="margin-top:14px"><h3>🤝 Sponsors</h3><table>${Object.entries(proSpons(p)).map(([c,b])=>`<tr><td>${SPONSOR_CATS[c].i} ${SPONSOR_CATS[c].n}</td><td>${logo('brand',b,b,20)}<b>${esc(b)}</b>${PRO_SPONS_REAL[id]&&PRO_SPONS_REAL[id][c]?'':' <span class="small mut">*</span>'}</td></tr>`).join('')}</table><p class="small mut">* attribué par le jeu</p></div></div>
+  <div class="card" style="margin-top:14px"><h3>🤝 Sponsors</h3><table>${Object.entries(proSpons(p)).map(([c,b])=>`<tr><td>${SPONSOR_CATS[c].i} ${SPONSOR_CATS[c].n}</td><td style="display:flex;align-items:center">${logo('brand',b,b,30)}<b class="click" onclick="openBrand('${b.replace(/'/g,"\\'")}')">${esc(b)}</b>${PRO_SPONS_REAL[id]&&PRO_SPONS_REAL[id][c]?'':' <span class="small mut">*</span>'}</td></tr>`).join('')}</table><p class="small mut">* attribué par le jeu</p></div></div>
   <div class="card"><h3>UTMB Index</h3><div class="grid" style="grid-template-columns:repeat(5,1fr);gap:8px">${['gen',...CATS].map(c=>`<div data-tip="${esc(c==='gen'?'<b>Index général</b> — Son meilleur index de catégorie.':'<b>Index '+c+'</b> — Moyenne de ses 3 meilleures perfs '+c+' sur le circuit UTMB (2 dernières saisons). Sans résultat récent, on part de son niveau de référence.')}"><div class="mut small">${c==='gen'?'Général':c}</div><div class="kpi">${c==='gen'?proGen(p):proIdx(p,c)}</div></div>`).join('')}</div>
    <h3 style="margin-top:10px">Programme ${S.season}</h3><table>${sch.map(x=>{const e=EVMAP[x.e],f=getF(x.e,x.c);const r=(S.pros.res[id]||[]).find(y=>y.season===S.season&&y.e===x.e&&y.c===x.c);return`<tr><td class="small">${weekLabel(x.w)}</td><td>${esc(e.name.replace(/ by UTMB|HOKA /g,''))}<br><span class="small mut">${esc(f.name)} · ${f.km} km${isUTMB(e)?'':' · locale'}</span></td><td class="small">${r?(r.dnf?'<span class="bad">DNF</span>':fmtT(r.time)+(r.index?' · <b>'+r.index+'</b>':'')):(x.w<S.week?'—':'<span class="mut">à venir</span>')}</td></tr>`;}).join('')}</table>
    ${res.filter(r=>r.season<S.season).length?`<h3 style="margin-top:10px">Saisons passées</h3><table>${res.filter(r=>r.season<S.season).slice(0,8).map(r=>`<tr><td>${r.season}</td><td class="small">${esc(EVMAP[r.e].name)} — ${esc(getF(r.e,r.c).name)}</td><td class="small">${r.dnf?'DNF':fmtT(r.time)}${r.index?' · '+r.index:''}</td></tr>`).join('')}</table>`:''}
