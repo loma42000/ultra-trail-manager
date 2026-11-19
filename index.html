@@ -532,6 +532,10 @@ const LOCAL_EVENTS=[
  E('bavaria','Chiemgau Trail','Ruhpolding','Allemagne','eu',9,20,'local',3,[F('CG50','Trail 50 km',50,2600),F('CG25','Trail 25 km',25,1200)],{zone:'baviere'})
 ];
 EVENTS.push(...LOCAL_EVENTS);EVENTS.sort((a,b)=>a.m-b.m||a.d-b.d);
+// jeu 100 miles uniquement : on ne garde que les formats de 125 km et plus
+for(const e of EVENTS)e.formats=e.formats.filter(f=>f.km>=125);
+for(let i=EVENTS.length-1;i>=0;i--)if(!EVENTS[i].formats.length)EVENTS.splice(i,1);
+LOCAL_EVENTS.length=0;
 const isUTMB=e=>['event','major','final'].includes(e.tier);
 
 // ---------- coureurs pros ----------
@@ -662,6 +666,10 @@ const normN=t=>String(t||'').normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase
 function lev(a,b){const d=[...Array(b.length+1).keys()];for(let i=1;i<=a.length;i++){let p=d[0];d[0]=i;for(let j=1;j<=b.length;j++){const t=d[j];d[j]=Math.min(d[j]+1,d[j-1]+1,p+(a[i-1]===b[j-1]?0:1));p=t;}}return d[b.length];}
 const normB=t=>String(t||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]/g,'');
 function matchBrand(cat,raw){if(!raw)return null;const n=normB(raw);const L=(BRANDS[cat]||[]).map(b=>b[0]);let best=null,bd=9;for(const b of L){const m=normB(b);const dd=m===n?0:(m.startsWith(n)||n.startsWith(m))?1:lev(m,n);if(dd<bd){bd=dd;best=b;}}return bd<=2?best:String(raw).replace(/^./,c=>c.toUpperCase());}
+const ACRO=['utmb','tds','ccc','occ','ptl','miut','uts','vda','uta','utct','mds','hurt','gtlc','ut4m','utmj','grp','ultra-trail'];
+const RNAMES={wser:'Western States 100',westernstates:'Western States 100',hardrock:'Hardrock 100',diagonale:'Diagonale des Fous',diagonaledesfous:'Diagonale des Fous',grandraid:'Grand Raid Réunion',tor:'Tor des Géants',tordesgeants:'Tor des Géants',saintelyon:'SaintéLyon',lyonsaintelyon:'Lyon SaintéLyon',transgrancanaria:'Transgrancanaria',lavaredo:'Lavaredo',spine:'Spine Race',cocodona:'Cocodona 250'};
+function raceName(t){const raw=String(t).trim();const k=normN(raw);if(RNAMES[k])return RNAMES[k];
+ return raw.split(/\s+/).map(w=>{const l=w.toLowerCase();if(ACRO.includes(l))return w.toUpperCase();if(/^\d+(k|m|km|mi)$/i.test(w))return w.replace(/(k|m)$/i,c=>c.toUpperCase()).replace(/km$/i,'K');if(/^(de|du|des|la|le|les|by|of|the|del|di|dei|d)$/i.test(w))return l;return w.charAt(0).toUpperCase()+w.slice(1);}).join(' ').replace(/^./,c=>c.toUpperCase());}
 (function applySheet(){
  const NAT={};for(const a of PROS_RAW){NAT[normN(a[3])]=[a[3],a[4],a[6]];NAT[normN(a[6])]=[a[3],a[4],a[6]];}
  Object.assign(NAT,{us:NAT.usa,unitedstates:NAT.usa,etatsunis:NAT.usa,france:NAT.fr,gb:NAT.uk,angleterre:NAT.uk,royaumeuni:NAT.uk});
@@ -677,7 +685,7 @@ function matchBrand(cat,raw){if(!raw)return null;const n=normB(raw);const L=(BRA
   const id=(a[0]+a[1]).toLowerCase().replace(/[^a-z]/g,'');
   const sp={};for(const c in CATS){const b=matchBrand(c,r[c]);if(b)sp[c]=b;}
   if(Object.keys(sp).length)PRO_SPONS_REAL[id]=Object.assign(PRO_SPONS_REAL[id]||{},sp);
-  if(r.pal)PALMARES[id]=String(r.pal).split(/[,;\n]/).map(x=>x.trim()).filter(Boolean).map(x=>x.replace(/^1\s+/,'1er ').replace(/^(\d+)\s+/,'$1e '));
+  if(r.pal)PALMARES[id]=String(r.pal).split(/[,;\n]/).map(x=>x.trim()).filter(Boolean).map(x=>{const m=x.match(/^(\d+)\s*[x×]?\s+(.+)$/);const n=m?+m[1]:1;return '🥇 '+raceName(m?m[2]:x)+' — '+n+' victoire'+(n>1?'s':'');});
  }
 })();
 const PROS=PROS_RAW.map(a=>({id:(a[0]+a[1]).toLowerCase().replace(/[^a-z]/g,''),first:a[0],last:a[1],sex:a[2],nat:a[3],flag:a[4],born:a[5],zone:a[6],home:a[7],idx:a[8],spec:a[9]}));
@@ -706,7 +714,7 @@ function genProSchedules(){
  for(const p of PROS){
   const sch=[];const rng=seeded(S.season+'sched'+p.id);const ok=w=>sch.every(x=>Math.abs(x.w-w)>=(EVMAP[x.e].tier==='local'?2:4));
   for(const ev of LOCAL_EVENTS){if(ev.zone!==p.zone)continue;const w=evWeek(ev);if(rng()<.85&&sch.every(x=>Math.abs(x.w-w)>=2)){const f=[...ev.formats].sort((a,b)=>b.km-a.km)[0];sch.push({e:ev.id,c:f.code,w});}}
-  const fin=EVMAP.utmb;const fc={ultra:'UTMB',long:'CCC',court:'OCC',poly:rng()<.5?'CCC':'OCC'}[p.spec];
+  const fin=EVMAP.utmb;const fc=rng()<.8?'UTMB':'TDS';
   if(rng()<.85)sch.push({e:'utmb',c:fc,w:evWeek(fin)});
   const eu=['France','Espagne','Italie','Suisse','Allemagne','Royaume-Uni','Suède','Hongrie'].includes(p.nat);
   const pool=utmbEv.filter(e=>e.id!=='utmb');
@@ -822,7 +830,7 @@ function rankRows(){const q=norm(RK.q||'');const L=RK.rows.filter(r=>!q||norm(r.
 const EVMAP=Object.fromEntries(EVENTS.map(e=>[e.id,e]));
 const getF=(eid,code)=>EVMAP[eid].formats.find(f=>f.code===code);
 
-const CATS=['20K','50K','100K','100M'];
+const CATS=['100M'];
 const catOf=f=>f.km<30?'20K':f.km<70?'50K':f.km<125?'100K':'100M';
 const STONES={'20K':1,'50K':2,'100K':3,'100M':4};
 const FEE={'20K':45,'50K':90,'100K':160,'100M':260};
@@ -840,7 +848,7 @@ function evDateLabel(e){return (e.dEst?'≈ ':'')+(e.dLabel||(e.d+' '+MONTHS[e.m
 
 // ---------- état ----------
 let S=null, TAB='home', CAL_FILTER={cat:'all',reg:'all'};
-const APP_VERSION='2026-11-19-a';
+const APP_VERSION='2026-11-19-b';
 const SAVE_KEY='ultraTrailManager_v1';
 // ---------- sauvegardes multiples (une par carrière) ----------
 const IDX_KEY='utm_careers_v1',SLOT=id=>'utm_career_'+id;
@@ -863,7 +871,8 @@ function deleteCareer(id){
  if(S&&S.id===id)S=null;render();
 }
 function playCareer(id){if(S&&S.id!==id)save();if(loadCareer(id)){SCREEN='game';TAB='home';render();}else toast('Sauvegarde introuvable.');}
-function migrate(){S.inbox=S.inbox||[];S.media=S.media||[];S.mediaOffers=S.mediaOffers||[];S.fans=S.fans||0;S.hist=S.hist||{};if(!S.pros)initPros();if(PROS.some(p=>!S.pros.res[p.id])){PROS.forEach(p=>S.pros.res[p.id]=S.pros.res[p.id]||[]);genProSchedules();}if(!S.runner.potential)S.runner.potential='correct';if(!S.runner.langs)S.runner.langs={fr:100};if(!S.team){S.team={};delete S.staff;delete S.staffNames;}if(!S.market||!Object.keys(S.market).length)refreshMarket();for(const r in S.market)S.market[r].forEach(m=>{if(!m.common)m.common=genCommon(m.age);});for(const r in S.team){const m=S.team[r];if(m&&!m.common)m.common=genCommon(m.age);}}
+function migrate(){if(S.dataVer!==2&&S.pros){const ok=(e,c)=>EVMAP[e]&&EVMAP[e].formats.some(f=>f.code===c);S.regs=(S.regs||[]).filter(r=>ok(r.e,r.c));S.results=(S.results||[]).filter(r=>ok(r.e,r.c));for(const id in S.pros.res)S.pros.res[id]=S.pros.res[id].filter(r=>ok(r.e,r.c));S.goal=null;S.dataVer=2;genProSchedules();}else S.dataVer=2;
+ S.inbox=S.inbox||[];S.media=S.media||[];S.mediaOffers=S.mediaOffers||[];S.fans=S.fans||0;S.hist=S.hist||{};if(!S.pros)initPros();if(PROS.some(p=>!S.pros.res[p.id])){PROS.forEach(p=>S.pros.res[p.id]=S.pros.res[p.id]||[]);genProSchedules();}if(!S.runner.potential)S.runner.potential='correct';if(!S.runner.langs)S.runner.langs={fr:100};if(!S.team){S.team={};delete S.staff;delete S.staffNames;}if(!S.market||!Object.keys(S.market).length)refreshMarket();for(const r in S.market)S.market[r].forEach(m=>{if(!m.common)m.common=genCommon(m.age);});for(const r in S.team){const m=S.team[r];if(m&&!m.common)m.common=genCommon(m.age);}}
 function log(txt,type){S.log.unshift({s:S.season,w:S.week,txt,type:type||''});if(S.log.length>250)S.log.length=250;}
 const lvl=()=>LEVELS.find(l=>l.id===S.runner.level);
 const stonesValid=()=>S.stones.filter(x=>x.season>=S.season-1).reduce((a,x)=>a+x.n,0);
@@ -1264,10 +1273,18 @@ function genBadge(kind,name,size,tier){const ini=initials(name);const fs=Math.ro
  const [bg,fg]=TIER_COL[tier]||TIER_COL.event;
  return`<span style="display:inline-grid;place-items:center;width:${size}px;height:${size}px;border-radius:50%;background:${bg};border:2px solid ${fg}55;color:${fg};font-weight:800;font-size:${fs}px;position:relative">${ini}<svg viewBox="0 0 20 8" style="position:absolute;bottom:${Math.round(size*.12)}px;width:${Math.round(size*.55)}px;opacity:.6"><path d="M0 8 L6 2 L9 5 L13 0 L20 8Z" fill="${fg}"/></svg></span>`;}
 function logo(kind,id,name,size,tier){const k=kind+':'+id;const kj=esc(k.replace(/\\/g,'\\\\').replace(/'/g,"\\'"));const own=LOGOS[k];const src=own||LOGO_URL[k];size=size||26;
- const inner=src?`<img src="${esc(src)}" alt="" onerror="this.style.display='none'" style="width:${size}px;height:${size}px;object-fit:contain;border-radius:${kind==='brand'?7:size/2}px;background:${own?'#fff':'#0b1a23'};padding:${own?0:Math.round(size*.08)}px;box-sizing:border-box">`:genBadge(kind,name,size,tier);
- return`<span class="logo" data-tip="${esc('<b>'+name+'</b><br>'+(src?'Clique pour changer l\'image (clic droit : retirer)':'Clique pour mettre ta propre image'))}" onclick="event.stopPropagation();pickLogo('${kj}')" oncontextmenu="event.preventDefault();event.stopPropagation();delLogo('${kj}')">${inner}</span>`;}
+ const inner=src?`<img src="${esc(src)}" alt="" referrerpolicy="no-referrer" onerror="this.style.display='none';this.nextElementSibling.style.display='inline-block'" style="width:${size}px;height:${size}px;object-fit:contain;border-radius:${kind==='brand'?7:size/2}px;background:${own&&own.startsWith('data:')?'#fff':'#0b1a23'};padding:${own&&own.startsWith('data:')?0:Math.round(size*.08)}px;box-sizing:border-box">`:genBadge(kind,name,size,tier);
+ const fb=src?`<span style="display:none">${genBadge(kind,name,size,tier)}</span>`:'';
+ return`<span class="logo" data-tip="${esc('<b>'+name+'</b><br>'+(src?'Clique pour changer l\'image (clic droit : retirer)':'Clique pour mettre ta propre image'))}" onclick="event.stopPropagation();logoMenu('${kj}')" oncontextmenu="event.preventDefault();event.stopPropagation();delLogo('${kj}')">${inner}${fb}</span>`;}
 const LOGO_URL={};for(const r of SHEET.races){const e=EVENTS.find(x=>x.name===r.ev);if(e&&r.logo)LOGO_URL['race:'+e.id]=r.logo;}
-function fmtBadge(f,h){return SHEET.badge100&&catOf(f)==='100M'?`<img src="${esc(SHEET.badge100)}" alt="100M" onerror="this.style.display='none'" style="height:${h||16}px;vertical-align:middle;margin-left:6px">`:'';}
+function fmtBadge(f,h){return SHEET.badge100&&catOf(f)==='100M'?`<img src="${esc(SHEET.badge100)}" alt="100M" referrerpolicy="no-referrer" onerror="this.style.display='none'" style="height:${h||16}px;vertical-align:middle;margin-left:6px">`:'';}
+function logoMenu(k){const o=document.createElement('div');o.className='modal';o.style.zIndex=200;
+ o.innerHTML=`<div class="mbox" style="max-width:460px"><h3>Image</h3><p class="small mut">Colle le lien direct d'une image (il doit finir par .png, .jpg, .webp…) ou importe un fichier depuis ton ordinateur.</p>
+ <input id="lgurl" placeholder="https://…" style="width:100%;margin:8px 0"><div class="row" style="gap:8px;justify-content:flex-end"><button id="lgf">📁 Importer un fichier</button>${LOGOS[k]?'<button id="lgd">Retirer</button>':''}<button id="lgx">Annuler</button><button class="pri" id="lgok">Valider le lien</button></div></div>`;
+ document.body.appendChild(o);const close=()=>o.remove();o.onclick=e=>{if(e.target===o)close();};o.querySelector('#lgx').onclick=close;
+ o.querySelector('#lgf').onclick=()=>{close();pickLogo(k);};if(o.querySelector('#lgd'))o.querySelector('#lgd').onclick=()=>{close();delLogo(k);};
+ const ok=()=>{const u=o.querySelector('#lgurl').value.trim();if(!/^https?:\/\//.test(u)){toast('Colle un lien qui commence par http');return;}LOGOS[k]=u;try{localStorage.setItem(LOGO_KEY,JSON.stringify(LOGOS));}catch(e){}close();render();if(k.startsWith('pro:')&&document.getElementById('modal').className==='modal')openPro(k.slice(4));};
+ o.querySelector('#lgok').onclick=ok;o.querySelector('#lgurl').onkeydown=e=>{if(e.key==='Enter')ok();};setTimeout(()=>o.querySelector('#lgurl').focus(),30);}
 function pickLogo(k){const i=document.createElement('input');i.type='file';i.accept='image/*';
  i.onchange=()=>{const f=i.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{const img=new Image();img.onload=()=>{const c=document.createElement('canvas'),sz=256;c.width=c.height=sz;const x=c.getContext('2d');x.imageSmoothingQuality='high';const sc=Math.min(sz/img.width,sz/img.height);x.drawImage(img,(sz-img.width*sc)/2,(sz-img.height*sc)/2,img.width*sc,img.height*sc);
   LOGOS[k]=c.toDataURL('image/png');try{localStorage.setItem(LOGO_KEY,JSON.stringify(LOGOS));}catch(e){toast('Stockage plein : impossible d\'enregistrer l\'image.');}render();};img.src=r.result;};r.readAsDataURL(f);};i.click();}
@@ -1543,7 +1560,7 @@ function unreg(eid,code){const i=S.regs.findIndex(r=>r.e===eid&&r.c===code&&!r.d
 function vCal(){
  const ft=CAL_FILTER;if(ft.month==null)ft.month=new Date(firstMonday(S.season).getTime()+S.week*7*864e5).getMonth();
  let html=`<div class="card" style="margin-bottom:14px"><div class="row sp"><h2 data-tip="Running Stones : 20K = 1 · 50K = 2 · 100K = 3 · 100M = 4, doublées sur les Majors.<br>Badge ≈ = formats/chiffres approximatifs à vérifier sur le site de la course.">Calendrier ${S.season} — ${MONTHS[ft.month]} ℹ️</h2>
-  <div class="row"><select onchange="CAL_FILTER.circ=this.value;render()">${[['all','Toutes les courses'],['utmb','Circuit UTMB'],['classic','Grandes classiques'],['local','Courses locales']].map(([v,n])=>`<option ${ft.circ===v?'selected':''} value="${v}">${n}</option>`).join('')}</select><select onchange="CAL_FILTER.cat=this.value;render()">${['all',...CATS].map(c=>`<option ${ft.cat===c?'selected':''} value="${c}">${c==='all'?'Tous formats':c}</option>`).join('')}</select>
+  <div class="row"><select onchange="CAL_FILTER.circ=this.value;render()">${[['all','Toutes les courses'],['utmb','Circuit UTMB'],['classic','Grandes classiques']].map(([v,n])=>`<option ${ft.circ===v?'selected':''} value="${v}">${n}</option>`).join('')}</select><select onchange="CAL_FILTER.cat=this.value;render()">${['all',...CATS].map(c=>`<option ${ft.cat===c?'selected':''} value="${c}">${c==='all'?'Tous formats':c}</option>`).join('')}</select>
   <select onchange="CAL_FILTER.reg=this.value;render()">${[['all','Partout'],['fr','France'],['eu','Europe'],['world','Monde']].map(([v,n])=>`<option ${ft.reg===v?'selected':''} value="${v}">${n}</option>`).join('')}</select></div></div>
   <div class="row" style="margin:10px 0 0"><button class="sm" onclick="CAL_FILTER.month=(CAL_FILTER.month+11)%12;render()">◀</button>${MONTHS.map((m,i)=>`<button class="sm ${i===ft.month?'pri':''}" onclick="CAL_FILTER.month=${i};render()">${['janv.','févr.','mars','avr.','mai','juin','juil.','août','sept.','oct.','nov.','déc.'][i]}${EVENTS.some(e=>e.m-1===i&&S.regs.some(r=>r.e===e.id&&!r.done))?' ●':''}</button>`).join('')}<button class="sm" onclick="CAL_FILTER.month=(CAL_FILTER.month+1)%12;render()">▶</button></div>
 </div>`;
